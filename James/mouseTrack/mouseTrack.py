@@ -55,3 +55,5 @@ time.sleep(1)
 mouseRecording.clear()
 exitMouseRecording.set() #stop the thread
 
+#:)
+
