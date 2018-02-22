@@ -9,7 +9,7 @@ class App(QMainWindow):
         super().__init__()
         self.setWindowTitle('kitten')
         self.setWindowIcon(QIcon('../images/kitten_16'))
-        self.setGeometry(0, 0, 300, 200)
+        self.setGeometry(100, 100, 300, 200)
         self.home = Home(self)
         self.setCentralWidget(self.home)
 
