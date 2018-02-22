@@ -8,6 +8,7 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('kitten')
+        self.setWindowIcon(QIcon('../images/kitten_16'))
         self.setGeometry(0, 0, 300, 200)
         self.home = Home(self)
         self.setCentralWidget(self.home)
@@ -67,6 +68,8 @@ class Home(QWidget):
         v_box.addStretch(1) # This takes up space at the bottom.
 
         self.home_tab.setLayout(v_box)
+
+
 
 
         self.layout.addWidget(self.tabs)
