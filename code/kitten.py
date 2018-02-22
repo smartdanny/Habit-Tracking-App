@@ -18,7 +18,16 @@ class Home(QWidget):
 
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)
+        self.layout = QVBoxLayout(self)
 
+        # initialize tab screen
+        self.tabs = QTabWidget()
+        self.home_tab = QWidget()
+        self.data_select_tab = QWidget()
+
+        # Add tabs
+        self.tabs.addTab(self.home_tab,"Home")
+        self.tabs.addTab(self.data_select_tab,"Data Select")
 
         # Create welcome label
         kitten_lbl = QLabel(self)
@@ -57,7 +66,12 @@ class Home(QWidget):
         v_box.addLayout(row_3)
         v_box.addStretch(1) # This takes up space at the bottom.
 
-        self.setLayout(v_box)
+        self.home_tab.setLayout(v_box)
+
+
+        self.layout.addWidget(self.tabs)
+        # self.setLayout(self.layou)
+        self.setLayout(self.layout)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
