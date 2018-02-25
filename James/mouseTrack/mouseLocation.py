@@ -1,5 +1,10 @@
+#This file is old and uses constant sampling to get mouse location files
+
 from ctypes import windll, Structure, c_long, byref
 import threading, time
+
+# pull in mouseClicks
+# https://pypi.python.org/pypi/pynput
 
 class MOUSE(Structure):
     _fields_ = [("x", c_long), ("y", c_long)]
@@ -47,13 +52,18 @@ mouseTrackerThread.start()
 mouseRecording.set()
 time.sleep(1)
 mouseRecording.clear() #stop the thread
-time.sleep(5)
 
-#Can turn back on later with...
-mouseRecording.set() #enable recording for 1 second
-time.sleep(1)
-mouseRecording.clear()
+
+
 exitMouseRecording.set() #stop the thread
-
-#:)
+#
+# time.sleep(5)
+#
+# #Can turn back on later with...
+# mouseRecording.set() #enable recording for 1 second
+# time.sleep(1)
+# mouseRecording.clear()
+# exitMouseRecording.set() #stop the thread
+#
+# #:)
 
