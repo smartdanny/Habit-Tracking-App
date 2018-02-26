@@ -2,6 +2,8 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
+from mouseTrack import mouseClickAndLocation
+import time
 
 class App(QMainWindow):
 
@@ -30,6 +32,18 @@ class Home(QWidget):
         self.tabs.addTab(self.home_tab,"Home")
         self.tabs.addTab(self.data_select_tab,"Data Select")
 
+        self.make_home_tab()
+        self.make_data_select_tab()
+
+
+
+
+
+        self.layout.addWidget(self.tabs)
+        # self.setLayout(self.layou)
+        self.setLayout(self.layout)
+
+    def make_home_tab(self):
         # Create welcome label
         kitten_lbl = QLabel(self)
         kitten_lbl.setText('Hi! Welcome to kitten :)')
@@ -46,7 +60,7 @@ class Home(QWidget):
         row_2.addWidget(kitten_image_lbl)
         row_2.addStretch()
 
-    	# creat button to move to data selection page
+    	# just another quit button for now
         data_select_btn = QPushButton('select data', self)
         data_select_btn.clicked.connect(QCoreApplication.instance().quit)
         row_3 = QHBoxLayout()
@@ -69,12 +83,47 @@ class Home(QWidget):
 
         self.home_tab.setLayout(v_box)
 
+    def make_data_select_tab(self):
+        # creat button to move to data selection page
+        data_select_btn = QPushButton('Start Collecting Mouse Data', self)
+        data_select_btn.clicked.connect(self.record_mouse)
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(data_select_btn)
+        row_1.addStretch()
+
+        v_box = QVBoxLayout()
+        v_box.addStretch(1)
+        v_box.addLayout(row_1)
+        v_box.addStretch(1) # This takes up space at the bottom.
+
+        self.data_select_tab.setLayout(v_box)
+
+    def record_mouse(self):
+        # # initialize all event triggers to be clear (don't record anything)
+
+        # create mouseListener thread
+        mouse = mouseClickAndLocation.MOUSETHREAD()
+        mouse.recordScroll = False
+        mouse.recordClicks = False
+        mouse.recordLoc = False
+        mouse.start()
+
+        # wait for 2 seconds (don't record)
+        # time.sleep(2)
+
+        # turn on all event triggers and record for 2 seconds
+        mouse.recordScroll = True
+        mouse.recordClicks = True
+        mouse.recordLoc = True
+        time.sleep(2)
+
+        # stop thread
+        mouse.stop()
+
+        time.sleep(2)
 
 
-
-        self.layout.addWidget(self.tabs)
-        # self.setLayout(self.layou)
-        self.setLayout(self.layout)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

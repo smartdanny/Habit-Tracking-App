@@ -15,7 +15,7 @@ import time
 '''
 
 if __name__ == '__main__':
-
+    print(hay)
     # initialize all event triggers to be clear (don't record anything)
 
     # create mouseListener thread
@@ -38,4 +38,3 @@ if __name__ == '__main__':
     mouse.stop()
 
     time.sleep(2)
-
