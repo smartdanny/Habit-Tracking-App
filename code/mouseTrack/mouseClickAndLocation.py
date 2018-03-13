@@ -2,8 +2,10 @@ from pynput import mouse
 
 
 class MOUSETHREAD(mouse.Listener):
-    """I made my own class that is the child of mouse.Listener. Every time a click, movement, or scroll occurs, the
-    appropriate function name is executed. This is in a thread, so it can happen in parallel with the calling script"""
+    """
+    I made my own class that is the child of mouse.Listener. Every time a click, movement, or scroll occurs, the
+    appropriate function name is executed. This is in a thread, so it can happen in parallel with the calling script
+    """
 
     # initialize the class
     def __init__(self):
@@ -24,8 +26,13 @@ class MOUSETHREAD(mouse.Listener):
         self.y = y
         if self.recordLoc:
             print('Pointer moved to {0}'.format(
+<<<<<<< HEAD:James/mouseTrack/mouseClickAndLocation.py
                 (self.x, self.y)))
             self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.y) + '\n')
+=======
+                (self.x, self.x)))
+            # self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.x) + '\n')
+>>>>>>> 9afa8b64924c2ff73e5e5b53d8c4d7e8f2d16258:code/mouseTrack/mouseClickAndLocation.py
 
     # called when mouse clicks
     def on_click(self, x, y, button, pressed):
@@ -37,7 +44,7 @@ class MOUSETHREAD(mouse.Listener):
             else:
                 words = 'r ' + str(self.x) + ', ' + str(y)
             print(words)
-            self.write_csv('mouseClicks.csv', words + '\n')  # prints p if pressed and r if released
+            # self.write_csv('mouseClicks.csv', words + '\n')  # prints p if pressed and r if released
 
     # called when mouse moves
     def on_scroll(self, x, y, dx, dy):
@@ -50,6 +57,6 @@ class MOUSETHREAD(mouse.Listener):
         # print???
 
     # writes to .csv file in real time
-    def write_csv(self, csv, words):
-        with open(csv, 'a') as f:
-            f.write(words)
+    # def write_csv(self, csv, words):
+        # with open(csv, 'a') as f:
+        #     f.write(words)
