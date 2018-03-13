@@ -26,13 +26,8 @@ class MOUSETHREAD(mouse.Listener):
         self.y = y
         if self.recordLoc:
             print('Pointer moved to {0}'.format(
-<<<<<<< HEAD:James/mouseTrack/mouseClickAndLocation.py
                 (self.x, self.y)))
-            self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.y) + '\n')
-=======
-                (self.x, self.x)))
-            # self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.x) + '\n')
->>>>>>> 9afa8b64924c2ff73e5e5b53d8c4d7e8f2d16258:code/mouseTrack/mouseClickAndLocation.py
+            # self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.y) + '\n')
 
     # called when mouse clicks
     def on_click(self, x, y, button, pressed):
