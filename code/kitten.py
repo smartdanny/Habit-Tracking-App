@@ -28,24 +28,29 @@ class Home(QWidget):
         self.mouse_click_selection = False
         self.running_program_selection = False
         self.running_website_selection = False
+        self.keyboard_input_selection = False
 
         # Threads to collect data
         self.mouse_clicks = None
         self.mouse_movement = None
         self.programs = None
         self.websites = None
+        self.keyboard = None
 
         # initialize tab screen
         self.tabs = QTabWidget()
         self.home_tab = QWidget()
         self.data_select_tab = QWidget()
+        self.graphs_tab = QWidget()
 
         # Add tabs
         self.tabs.addTab(self.home_tab,"Home")
         self.tabs.addTab(self.data_select_tab,"Data Select")
+        self.tabs.addTab(self.graphs_tab, "Graphs")
 
         self.make_home_tab()
         self.make_data_select_tab()
+        self.make_graphs_tab()
 
         self.layout.addWidget(self.tabs)
         # self.setLayout(self.layou)
@@ -86,13 +91,6 @@ class Home(QWidget):
         self.home_tab.setLayout(v_box)
 
     def make_data_select_tab(self):
-        # creat button to move to data selection page
-        # data_select_btn = QPushButton('Start Collecting Mouse Data', self)
-        # data_select_btn.clicked.connect(self.record_mouse)
-        # row_1 = QHBoxLayout()
-        # row_1.addStretch()
-        # row_1.addWidget(data_select_btn)
-        # row_1.addStretch()
 
         mouse_check_box = QCheckBox('mouse movements', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
@@ -108,33 +106,40 @@ class Home(QWidget):
         row_2.addWidget(mouse_check_box)
         row_2.addStretch()
 
-        mouse_check_box = QCheckBox('running programs', self)
-        mouse_check_box.stateChanged.connect(self.switch_running_program_state)
+        mouse_check_box = QCheckBox('keyboard input', self)
+        mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(mouse_check_box)
         row_3.addStretch()
 
-        mouse_check_box = QCheckBox('running websites', self)
-        mouse_check_box.stateChanged.connect(self.switch_running_website_state)
+        mouse_check_box = QCheckBox('running programs', self)
+        mouse_check_box.stateChanged.connect(self.switch_running_program_state)
         row_4 = QHBoxLayout()
         row_4.addStretch()
         row_4.addWidget(mouse_check_box)
         row_4.addStretch()
 
-        data_select_btn = QPushButton('Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(self.initiate_data_collection)
+        mouse_check_box = QCheckBox('running websites', self)
+        mouse_check_box.stateChanged.connect(self.switch_running_website_state)
         row_5 = QHBoxLayout()
         row_5.addStretch()
-        row_5.addWidget(data_select_btn)
+        row_5.addWidget(mouse_check_box)
         row_5.addStretch()
+
+        data_select_btn = QPushButton('Begin Collecting Data!', self)
+        data_select_btn.clicked.connect(self.initiate_data_collection)
+        row_6 = QHBoxLayout()
+        row_6.addStretch()
+        row_6.addWidget(data_select_btn)
+        row_6.addStretch()
 
         data_stop_btn = QPushButton('Stop Collecting Data!', self)
         data_stop_btn.clicked.connect(self.stop_data_collection)
-        row_6 = QHBoxLayout()
-        row_6.addStretch()
-        row_6.addWidget(data_stop_btn)
-        row_6.addStretch()
+        row_7 = QHBoxLayout()
+        row_7.addStretch()
+        row_7.addWidget(data_stop_btn)
+        row_7.addStretch()
 
         v_box = QVBoxLayout()
         v_box.addStretch(1)
@@ -144,9 +149,25 @@ class Home(QWidget):
         v_box.addLayout(row_4)
         v_box.addLayout(row_5)
         v_box.addLayout(row_6)
+        v_box.addLayout(row_7)
         v_box.addStretch(1) # This takes up space at the bottom.
 
         self.data_select_tab.setLayout(v_box)
+
+    def make_graphs_tab(self):
+        graph_lbl = QLabel(self)
+        graph_lbl.setText('Place graphs here :)')
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(graph_lbl)
+        row_1.addStretch()
+
+        v_box = QVBoxLayout()
+        v_box.addStretch(1)
+        v_box.addLayout(row_1)
+        v_box.addStretch(1) # This takes up space at the bottom.
+
+        self.graphs_tab.setLayout(v_box)
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
@@ -170,6 +191,8 @@ class Home(QWidget):
             self.programs = None
         if self.websites is not None:
             self.websites = None
+        if self.keyboard is not None:
+            self.keyboard = None
 
     def record_mouse_movement(self):
         # # initialize all event triggers to be clear (don't record anything)
@@ -203,13 +226,6 @@ class Home(QWidget):
     def record_running_websites(self):
         print('Recording running websites')
 
-
-    def stop_record_mouse(self):
-        try:
-            self.mouse.stop()
-        except:
-            pass
-
     # Functions used to change the state of whether or not user wants data recorded #
     # Used in check boxes #
     def switch_mouse_movement_state(self):
@@ -217,6 +233,9 @@ class Home(QWidget):
 
     def switch_mouse_click_state(self):
         self.mouse_click_selection = not self.mouse_click_selection
+
+    def switch_keyboard_input_state(self):
+        self.keyboard_input_selection = not self.keyboard_input_selection
 
     def switch_running_program_state(self):
         self.running_program_selection = not self.running_program_selection
