@@ -1,6 +1,8 @@
 from pynput import mouse
+import os.path
 import time
 
+csvPath = 'data/'
 
 class MOUSETHREAD(mouse.Listener):
     """
@@ -30,7 +32,7 @@ class MOUSETHREAD(mouse.Listener):
         if self.recordLoc:
             print('Pointer moved to {0}'.format(
                 (self.x, self.y)) + ' at ' + str(self.t))
-            self.write_csv('mouseLoc.csv', str(self.x) + ', ' + str(self.y) + ', ' + str(self.t) + '\n')
+            self.write_csv('mouseLoc.csv', str(self.t)  + ', ' + str(self.x) + ', ' + str(self.y) + '\n')
 
     # called when mouse clicks
     def on_click(self, x, y, button, pressed):
@@ -39,11 +41,11 @@ class MOUSETHREAD(mouse.Listener):
         self.t = time.time()
         if self.recordClicks:
             if pressed:
-                words = 'p, ' + str(self.x) + ', ' + str(y) + ', ' + str(self.t)
+                words = str(self.t) + ', ' + 'p, ' + str(self.x) + ', ' + str(y)
             else:
-                words = 'r, ' + str(self.x) + ', ' + str(y) + ', ' + str(self.t)
+                words = str(self.t) + ', ' + 'r, ' + str(self.x) + ', ' + str(y)
             print(words)
-            self.write_csv('mouseClicks.csv', words +  '\n')  # prints p if pressed and r if released
+            self.write_csv('mouseClicks.csv', words + '\n') # prints p if pressed and r if released
 
     # called when mouse moves
     def on_scroll(self, x, y, dx, dy):
@@ -58,5 +60,15 @@ class MOUSETHREAD(mouse.Listener):
 
     # writes to .csv file in real time
     def write_csv(self, csv, words):
-        with open(csv, 'a') as f:
+        # If the file doesn't exist, make proper column titles
+        if not os.path.exists(csvPath + csv):
+            if(csv == 'mouseLoc.csv'):
+                with open(csvPath + csv, 'a') as f:
+                    f.write('Time, X, Y\n')
+            if(csv == 'mouseClicks.csv'):
+                with open(csvPath + csv, 'a') as f:
+                    f.write('Time, Pressed/Released, X, Y\n')
+
+        # Write data to file
+        with open(csvPath + csv, 'a') as f:
             f.write(words)
