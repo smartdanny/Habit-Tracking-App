@@ -5,6 +5,14 @@ from PyQt5.QtCore import pyqtSlot, QCoreApplication
 from mouseTrack import mouseClickAndLocation
 import time
 
+import matplotlib
+# Make sure that we are using QT5
+# matplotlib.use('Qt5Agg')
+# from PyQt5 import QtCore, QtWidgets
+# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.figure import Figure
+# from numpy import arange, sin, pi
+
 class App(QMainWindow):
 
     def __init__(self):
@@ -41,16 +49,16 @@ class Home(QWidget):
         self.tabs = QTabWidget()
         self.home_tab = QWidget()
         self.data_select_tab = QWidget()
-        self.graphs_tab = QWidget()
+        self.mouse_movement_tab = QWidget()
 
         # Add tabs
         self.tabs.addTab(self.home_tab,"Home")
         self.tabs.addTab(self.data_select_tab,"Data Select")
-        self.tabs.addTab(self.graphs_tab, "Graphs")
+        self.tabs.addTab(self.mouse_movement_tab, "Mouse Movement")
 
         self.make_home_tab()
         self.make_data_select_tab()
-        self.make_graphs_tab()
+        self.make_mouse_movement_tab()
 
         self.layout.addWidget(self.tabs)
         # self.setLayout(self.layou)
@@ -154,20 +162,32 @@ class Home(QWidget):
 
         self.data_select_tab.setLayout(v_box)
 
-    def make_graphs_tab(self):
-        graph_lbl = QLabel(self)
-        graph_lbl.setText('Place graphs here :)')
+    def make_mouse_movement_tab(self):
+        lbl = QLabel(self)
+        lbl.setText('Mouse Movements')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(graph_lbl)
+        row_1.addWidget(lbl)
         row_1.addStretch()
 
-        v_box = QVBoxLayout()
-        v_box.addStretch(1)
-        v_box.addLayout(row_1)
-        v_box.addStretch(1) # This takes up space at the bottom.
+        vis_btn = QPushButton('Visualize Data', self)
+        vis_btn.clicked.connect(self.initiate_data_collection)
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+        row_2.addWidget(vis_btn)
+        row_2.addStretch()
 
-        self.graphs_tab.setLayout(v_box)
+
+        v_box = QVBoxLayout()
+        v_box.addLayout(row_1)
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+
+        self.mouse_movement_tab.setLayout(v_box)
+
+    # def make_mouse_click_tab(self):
+    #
+
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
