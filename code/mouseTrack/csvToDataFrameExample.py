@@ -6,6 +6,6 @@ def read_from_CSV(csvFileName):
     return df
 
 # EXAMPLE
-df = read_from_CSV('mouseLoc.csv') #get the dataframe
-pd.set_option('display.float_format', lambda x: '%.7f' % x) #make sure scientific notation is off
-print(df) #print the data frame
+# df = read_from_CSV('mouseLoc.csv') #get the dataframe
+# pd.set_option('display.float_format', lambda x: '%.7f' % x) #make sure scientific notation is off
+# print(df) #print the data frame
