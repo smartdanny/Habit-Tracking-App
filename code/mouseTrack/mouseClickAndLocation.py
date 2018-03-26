@@ -65,10 +65,10 @@ class MOUSETHREAD(mouse.Listener):
         if not os.path.exists(csvPath + csv):
             if(csv == 'mouseLoc.csv'):
                 with open(csvPath + csv, 'a') as f:
-                    f.write('Time,X,Y\n')
+                    f.write('Time,x,y\n')
             if(csv == 'mouseClicks.csv'):
                 with open(csvPath + csv, 'a') as f:
-                    f.write('Time,Pressed/Released,X,Y\n')
+                    f.write('Time,Pressed/Released,x,y\n')
 
         # Write data to file
         with open(csvPath + csv, 'a') as f:
