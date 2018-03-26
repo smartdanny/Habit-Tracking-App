@@ -1,17 +1,56 @@
+
+
+
+
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
 from mouseTrack import mouseClickAndLocation
 import time
+import pandas as pd
+import numpy as np
+import math
 
 import matplotlib
 # Make sure that we are using QT5
-# matplotlib.use('Qt5Agg')
-# from PyQt5 import QtCore, QtWidgets
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-# from matplotlib.figure import Figure
-# from numpy import arange, sin, pi
+matplotlib.use('Qt5Agg')
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+class MyMplCanvas(FigureCanvas):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+
+        self.compute_initial_figure()
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+    def compute_initial_figure(self):
+        pass
+
+class MouseLocPlot(MyMplCanvas):
+
+    def compute_initial_figure(self):
+        t = pd.read_csv('../data/mouseLoc.csv')['x']
+        s = pd.read_csv('../data/mouseLoc.csv')['y']
+        self.axes.plot(t, s)
+
+class MouseClickPlot(MyMplCanvas):
+
+    def compute_initial_figure(self):
+        t = pd.read_csv('../data/mouseClicks.csv')['x']
+        s = pd.read_csv('../data/mouseClicks.csv')['y']
+        self.axes.plot(t, s)
 
 class App(QMainWindow):
 
@@ -19,7 +58,7 @@ class App(QMainWindow):
         super().__init__()
         self.setWindowTitle('kitten')
         self.setWindowIcon(QIcon('../images/kitten_16'))
-        self.setGeometry(100, 100, 300, 200)
+        self.setGeometry(100, 100, 500, 400)
         self.home = Home(self)
         self.setCentralWidget(self.home)
 
@@ -50,18 +89,20 @@ class Home(QWidget):
         self.home_tab = QWidget()
         self.data_select_tab = QWidget()
         self.mouse_movement_tab = QWidget()
+        self.mouse_click_tab = QWidget()
 
         # Add tabs
         self.tabs.addTab(self.home_tab,"Home")
         self.tabs.addTab(self.data_select_tab,"Data Select")
-        self.tabs.addTab(self.mouse_movement_tab, "Mouse Movement")
+        self.tabs.addTab(self.mouse_movement_tab, "Mouse Movements")
+        self.tabs.addTab(self.mouse_click_tab, "Mouse Clicks")
 
         self.make_home_tab()
         self.make_data_select_tab()
         self.make_mouse_movement_tab()
+        self.make_mouse_click_tab()
 
         self.layout.addWidget(self.tabs)
-        # self.setLayout(self.layou)
         self.setLayout(self.layout)
 
     def make_home_tab(self):
@@ -163,6 +204,9 @@ class Home(QWidget):
         self.data_select_tab.setLayout(v_box)
 
     def make_mouse_movement_tab(self):
+
+        v_box = QVBoxLayout()
+
         lbl = QLabel(self)
         lbl.setText('Mouse Movements')
         row_1 = QHBoxLayout()
@@ -170,24 +214,61 @@ class Home(QWidget):
         row_1.addWidget(lbl)
         row_1.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        vis_btn.clicked.connect(self.initiate_data_collection)
         row_2 = QHBoxLayout()
         row_2.addStretch()
-        row_2.addWidget(vis_btn)
-        row_2.addStretch()
 
+        vis_btn = QPushButton('Visualize Data', self)
+        vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(vis_btn)
+        row_3.addStretch()
 
-        v_box = QVBoxLayout()
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
 
         self.mouse_movement_tab.setLayout(v_box)
 
-    # def make_mouse_click_tab(self):
-    #
+    def make_mouse_click_tab(self):
+        v_box = QVBoxLayout()
 
+        lbl = QLabel(self)
+        lbl.setText('Mouse Clicks')
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(lbl)
+        row_1.addStretch()
+
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+
+        vis_btn = QPushButton('Visualize Data', self)
+        vis_btn.clicked.connect(lambda: self.plot_mouse_clicks(row_2))
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(vis_btn)
+        row_3.addStretch()
+
+        v_box.addLayout(row_1)
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
+
+        self.mouse_click_tab.setLayout(v_box)
+
+    def plot_mouse_loc(self, row):
+        widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
+        row.addWidget(widget)
+        row.addStretch()
+
+    def plot_mouse_clicks(self, row):
+        widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
+        row.addWidget(widget)
+        row.addStretch()
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
