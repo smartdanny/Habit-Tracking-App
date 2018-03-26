@@ -8,7 +8,7 @@ as well as csvToDataFrame in order to create a df.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import csvToDataFrameExample
+from mouseTrack import csvToDataFrameExample
 
 # EXAMPLE
 #Getting dataframe
