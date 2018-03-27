@@ -22,7 +22,7 @@ class KeyboardThread(keyboard.Listener):
                 words = str(t) + ', ' + 'p, {0}'.format(key.char)
             except AttributeError:
                 #words = 'special key {0} pressed'.format(key)
-                words = str(t) + ', ' + 'p, {0}'.format(key)[7:]
+                words = str(t) + ', ' + 'p, ' + '{0}'.format(key)[4:]
             print(words)
             self.write_csv('keyboard.csv', words + '\n')  # prints p if pressed
 
@@ -34,7 +34,7 @@ class KeyboardThread(keyboard.Listener):
                 words = str(t) + ', ' + 'r, {0}'.format(key.char)
             except AttributeError:
                 #words = '{0} released'.format(key)
-                words = str(t) + ', ' + 'r, {0}'.format(key)[7:]
+                words = str(t) + ', ' + 'r, ' + '{0}'.format(key)[4:]
             print(words)
             self.write_csv('keyboard.csv', words + '\n')  # prints r if released
 
