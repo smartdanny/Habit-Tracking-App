@@ -1,7 +1,3 @@
-
-
-
-
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy
 from PyQt5.QtGui import QIcon, QPixmap
@@ -17,6 +13,8 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+
+import seaborn as sns; sns.set(style="white", color_codes=True)
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -44,13 +42,14 @@ class MouseLocPlot(MyMplCanvas):
         t = pd.read_csv('../data/mouseLoc.csv')['x']
         s = pd.read_csv('../data/mouseLoc.csv')['y']
         self.axes.plot(t, s)
+        # g = sns.jointplot("x", "y", data=df[['x', 'y']], kind = "kde", space=0)
 
 class MouseClickPlot(MyMplCanvas):
 
     def compute_initial_figure(self):
         t = pd.read_csv('../data/mouseClicks.csv')['x']
         s = pd.read_csv('../data/mouseClicks.csv')['y']
-        self.axes.plot(t, s)
+        self.axes.plot(t, s, 'ro')
 
 class App(QMainWindow):
 
@@ -261,14 +260,20 @@ class Home(QWidget):
         self.mouse_click_tab.setLayout(v_box)
 
     def plot_mouse_loc(self, row):
-        widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
-        row.addWidget(widget)
-        row.addStretch()
+        if row.count() > 2:
+            row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
+        else:
+            widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
+            row.addWidget(widget)
+            row.addStretch()
 
     def plot_mouse_clicks(self, row):
-        widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
-        row.addWidget(widget)
-        row.addStretch()
+        if row.count() > 2:
+            row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
+        else:
+            widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
+            row.addWidget(widget)
+            row.addStretch()
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
