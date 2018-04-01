@@ -5,5 +5,5 @@
 
 .idea
 *.csv
-/mouseTrack/__pycache__/*
+/kitten/lib/mouseTrack/__pycache__/*
 .DS_Store
