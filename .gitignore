@@ -5,4 +5,5 @@
 
 .idea
 *.csv
-/__pycache__/*
+/mouseTrack/__pycache__/*
+.DS_Store
