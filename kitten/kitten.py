@@ -1,8 +1,9 @@
 import sys
+sys.path.append('./lib/')
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
-from lib.mouseTrack import mouseClickAndLocation
+from mouseTrack import mouseClickAndLocation
 import time
 import pandas as pd
 import numpy as np
