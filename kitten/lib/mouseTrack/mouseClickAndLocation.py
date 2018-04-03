@@ -1,6 +1,7 @@
 from pynput import mouse
 import os.path
 import time
+import datetime
 
 csvPath = './data/'
 
@@ -28,7 +29,7 @@ class MOUSETHREAD(mouse.Listener):
     def on_move(self, x, y):
         self.x = x
         self.y = y
-        self.t = time.time()
+        self.t = datetime.datetime.fromtimestamp(time.time())
         if self.recordLoc:
             print('Pointer moved to {0}'.format((self.x, self.y)) + ' at ' + str(self.t))
             # with open('somefile.txt', 'a') as the_file:
@@ -39,7 +40,7 @@ class MOUSETHREAD(mouse.Listener):
     def on_click(self, x, y, button, pressed):
         self.x = x
         self.y = y
-        self.t = time.time()
+        self.t = datetime.datetime.fromtimestamp(time.time())
         if self.recordClicks:
             if pressed:
                 words = str(self.t) + ', ' + 'p, ' + str(self.x) + ', ' + str(y)
