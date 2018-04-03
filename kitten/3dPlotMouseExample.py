@@ -8,17 +8,17 @@ as well as csvToDataFrame in order to create a df.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from mouseTrack import csvToDataFrameExample
+import lib.mouseTrack.csvToDataFrameExample as csv
 
 # EXAMPLE
 #Getting dataframe
-df = csvToDataFrameExample.read_from_CSV('mouseLoc.csv') #get the dataframe
-csvToDataFrameExample.pd.set_option('display.float_format', lambda x: '%.7f' % x) #make sure scientific notation is off
+df = csv.read_from_CSV('mouseLoc.csv') #get the dataframe
+csv.pd.set_option('display.float_format', lambda x: '%.7f' % x) #make sure scientific notation is off
 
 print(df)
 
 #Plotting 3D plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-plt.plot(df['X'], df['Y'], zs=df['Time'])
+plt.plot(df['x'], df['y'], zs=df['Time'])
 plt.show()

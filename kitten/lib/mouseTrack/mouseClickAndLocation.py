@@ -2,7 +2,7 @@ from pynput import mouse
 import os.path
 import time
 
-csvPath = '../data/'
+csvPath = './data/'
 
 class MOUSETHREAD(mouse.Listener):
     """

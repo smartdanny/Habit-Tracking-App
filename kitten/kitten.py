@@ -1,12 +1,10 @@
-
-
-
-
 import sys
+sys.path.append('./lib/')
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
 from mouseTrack import mouseClickAndLocation
+from keyboardTrack import keyboardTracking
 import time
 import pandas as pd
 import numpy as np
@@ -41,23 +39,43 @@ class MyMplCanvas(FigureCanvas):
 class MouseLocPlot(MyMplCanvas):
 
     def compute_initial_figure(self):
-        t = pd.read_csv('../data/mouseLoc.csv')['x']
-        s = pd.read_csv('../data/mouseLoc.csv')['y']
+        t = pd.read_csv('./data/mouseLoc.csv')['x']
+        s = pd.read_csv('./data/mouseLoc.csv')['y']
         self.axes.plot(t, s)
+        # g = sns.jointplot("x", "y", data=df[['x', 'y']], kind = "kde", space=0)
 
 class MouseClickPlot(MyMplCanvas):
 
     def compute_initial_figure(self):
-        t = pd.read_csv('../data/mouseClicks.csv')['x']
-        s = pd.read_csv('../data/mouseClicks.csv')['y']
-        self.axes.plot(t, s)
+        t = pd.read_csv('./data/mouseClicks.csv')['x']
+        s = pd.read_csv('./data/mouseClicks.csv')['y']
+        self.axes.plot(t, s, 'ro')
+
+class KeyboardPlot(MyMplCanvas):
+
+    def compute_initial_figure(self):
+        keys = list(pd.read_csv('./data/keyboard.csv')['Key'])
+        unique_keys = list(set(keys))
+        freq = []
+        for key in unique_keys:
+            freq.append(keys.count(key))
+
+        ind = np.arange(len(unique_keys))  # the x locations for the groups
+        width = 0.35  # the width of the bars
+
+        self.axes.bar(ind, freq, color='SkyBlue')
+        self.axes.set_ylabel('Frequency')
+        self.axes.set_xlabel('Keys')
+        self.axes.set_xticks(ind)
+        self.axes.set_xticklabels(unique_keys)
+
 
 class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle('kitten')
-        self.setWindowIcon(QIcon('../images/kitten_16'))
+        self.setWindowIcon(QIcon('./images/kitten_16'))
         self.setGeometry(100, 100, 500, 400)
         self.home = Home(self)
         self.setCentralWidget(self.home)
@@ -90,17 +108,20 @@ class Home(QWidget):
         self.data_select_tab = QWidget()
         self.mouse_movement_tab = QWidget()
         self.mouse_click_tab = QWidget()
+        self.keyboard_tab = QWidget()
 
         # Add tabs
         self.tabs.addTab(self.home_tab,"Home")
         self.tabs.addTab(self.data_select_tab,"Data Select")
         self.tabs.addTab(self.mouse_movement_tab, "Mouse Movements")
         self.tabs.addTab(self.mouse_click_tab, "Mouse Clicks")
+        self.tabs.addTab(self.keyboard_tab, "Keyboard Input")
 
         self.make_home_tab()
         self.make_data_select_tab()
         self.make_mouse_movement_tab()
         self.make_mouse_click_tab()
+        self.make_keyboard_tab()
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
@@ -116,7 +137,7 @@ class Home(QWidget):
 
         # Add kitten image
         kitten_image_lbl = QLabel(self)
-        kitten_image_lbl.setPixmap(QPixmap('../images/kitten_image.png'))
+        kitten_image_lbl.setPixmap(QPixmap('./images/kitten_image.png'))
         row_2 = QHBoxLayout()
         row_2.addStretch()
         row_2.addWidget(kitten_image_lbl)
@@ -260,15 +281,57 @@ class Home(QWidget):
 
         self.mouse_click_tab.setLayout(v_box)
 
+    def make_keyboard_tab(self):
+        v_box = QVBoxLayout()
+
+        lbl = QLabel(self)
+        lbl.setText('Keyboard Input')
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(lbl)
+        row_1.addStretch()
+
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+
+        vis_btn = QPushButton('Visualize Data', self)
+        vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2))
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(vis_btn)
+        row_3.addStretch()
+
+        v_box.addLayout(row_1)
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
+
+        self.keyboard_tab.setLayout(v_box)
+
     def plot_mouse_loc(self, row):
-        widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
-        row.addWidget(widget)
-        row.addStretch()
+        if row.count() > 2:
+            row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
+        else:
+            widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
+            row.addWidget(widget)
+            row.addStretch()
 
     def plot_mouse_clicks(self, row):
-        widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
-        row.addWidget(widget)
-        row.addStretch()
+        if row.count() > 2:
+            row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
+        else:
+            widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
+            row.addWidget(widget)
+            row.addStretch()
+
+    def plot_keyboard_input(self, row):
+        if row.count() > 2:
+            row.replaceWidget(row.itemAt(1).widget(), KeyboardPlot(QWidget(self), width=5, height=4, dpi=100))
+        else:
+            widget = KeyboardPlot(QWidget(self), width=5, height=4, dpi=100)
+            row.addWidget(widget)
+            row.addStretch()
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
@@ -276,6 +339,8 @@ class Home(QWidget):
             self.record_mouse_movement()
         if self.mouse_click_selection and self.mouse_clicks is None:
             self.record_mouse_clicks()
+        if self.keyboard_input_selection and self.keyboard is None:
+            self.record_keyboard_input()
         if self.running_program_selection and self.programs is None:
             self.record_running_programs()
         if self.running_website_selection and self.websites is None:
@@ -288,6 +353,9 @@ class Home(QWidget):
         if self.mouse_clicks is not None:
             self.mouse_clicks.recordClicks = False
             self.mouse_clicks = None
+        if self.keyboard is not None:
+            self.keyboard.recordkeyPress = False
+            self.keyboard = None
         if self.programs is not None:
             self.programs = None
         if self.websites is not None:
@@ -321,6 +389,14 @@ class Home(QWidget):
         # turn on all event triggers
         self.mouse_clicks.recordClicks = True
 
+    def record_keyboard_input(self):
+        self.keyboard = keyboardTracking.KeyboardThread()
+        self.keyboard.recordkeyPress = False;
+        self.keyboard.recordkeyRelease = False;
+        self.keyboard.start()
+
+        self.keyboard.recordkeyPress = True;
+
     def record_running_programs(self):
         print('Recording running programs')
 
@@ -343,7 +419,6 @@ class Home(QWidget):
 
     def switch_running_website_state(self):
         self.running_website_selection = not self.running_website_selection
-
 
 
 if __name__ == '__main__':

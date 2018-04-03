@@ -14,7 +14,7 @@ Next, you will need [PIP](https://pip.pypa.io/en/stable/) (Python Package Index)
 ### Installation
 Navigate to the directory that holds `pip.exe` (or if the directory path is included in your local machine's PATH environment variable, navigate anywhere) and install the following required modules:
 
-`$ pip install PyQt5 pynput`
+`$ pip install PyQt5 pynput pandas matplotlib`
 
 **We need to be sure to update the required Python modules to the install command above**
 
