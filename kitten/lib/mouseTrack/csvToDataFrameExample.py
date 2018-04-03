@@ -3,6 +3,7 @@ import lib.mouseTrack.mouseClickAndLocation as clickAndLoc #to get the csv path
 
 def read_from_CSV(csvFileName):
     df = pd.read_csv(clickAndLoc.csvPath + csvFileName);
+    df['Time'] = pd.to_datetime(df['Time'])
     return df
 
 # EXAMPLE
