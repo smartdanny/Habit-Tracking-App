@@ -311,27 +311,45 @@ class Home(QWidget):
 
     def plot_mouse_loc(self, row):
         if row.count() > 2:
-            row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
+            try:
+                row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
+            except:
+                pass
         else:
-            widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
-            row.addWidget(widget)
-            row.addStretch()
+            try:
+                widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
+                row.addWidget(widget)
+                row.addStretch()
+            except:
+                pass
 
     def plot_mouse_clicks(self, row):
         if row.count() > 2:
-            row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
+            try:
+                row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
+            except:
+                pass
         else:
-            widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
-            row.addWidget(widget)
-            row.addStretch()
+            try:
+                widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
+                row.addWidget(widget)
+                row.addStretch()
+            except:
+                pass
 
     def plot_keyboard_input(self, row):
         if row.count() > 2:
-            row.replaceWidget(row.itemAt(1).widget(), KeyboardPlot(QWidget(self), width=5, height=4, dpi=100))
+            try:
+                row.replaceWidget(row.itemAt(1).widget(), KeyboardPlot(QWidget(self), width=5, height=4, dpi=100))
+            except:
+                pass
         else:
-            widget = KeyboardPlot(QWidget(self), width=5, height=4, dpi=100)
-            row.addWidget(widget)
-            row.addStretch()
+            try:
+                widget = KeyboardPlot(QWidget(self), width=5, height=4, dpi=100)
+                row.addWidget(widget)
+                row.addStretch()
+            except:
+                pass
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
