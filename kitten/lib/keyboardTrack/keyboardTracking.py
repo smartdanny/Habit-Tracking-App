@@ -2,7 +2,7 @@ from pynput import keyboard
 import os.path
 import time
 
-csvPath = '../../data/'
+csvPath = './data/'
 
 class KeyboardThread(keyboard.Listener):
 
