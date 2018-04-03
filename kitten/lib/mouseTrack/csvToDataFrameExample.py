@@ -1,8 +1,8 @@
 import pandas as pd
-from mouseTrack import mouseClickAndLocation #to get the csv path
+import lib.mouseTrack.mouseClickAndLocation as clickAndLoc #to get the csv path
 
 def read_from_CSV(csvFileName):
-    df = pd.read_csv(mouseClickAndLocation.csvPath + csvFileName);
+    df = pd.read_csv(clickAndLoc.csvPath + csvFileName);
     return df
 
 # EXAMPLE

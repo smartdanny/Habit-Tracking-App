@@ -2,7 +2,7 @@
 # Kitten Git Ignore
 ################################################################################
 
-
+.ropeproject/
 .idea
 *.csv
 /kitten/lib/mouseTrack/__pycache__/*
