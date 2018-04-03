@@ -1,6 +1,7 @@
 from pynput import keyboard
 import os.path
 import time
+import datetime
 
 csvPath = './data/'
 
@@ -15,7 +16,7 @@ class KeyboardThread(keyboard.Listener):
         self.recordkeyRelease = False;
 
     def on_press(self,key):
-        t = time.time()
+        t = datetime.datetime.fromtimestamp(time.time())
         if self.recordkeyPress:
             try:
                 #words = 'alphanumeric key {0} pressed'.format(key.char)
@@ -27,7 +28,7 @@ class KeyboardThread(keyboard.Listener):
             self.write_csv('keyboard.csv', words + '\n')  # prints p if pressed
 
     def on_release(self,key):
-        t = time.time()
+        t = datetime.datetime.fromtimestamp(time.time())
         if self.recordkeyRelease:
             try:
                 #words = '{0} released'.format(key.char)
