@@ -15,6 +15,8 @@ from mouseTrack import csvToDataFrameExample
 df = csvToDataFrameExample.read_from_CSV('mouseLoc.csv') #get the dataframe
 csvToDataFrameExample.pd.set_option('display.float_format', lambda x: '%.7f' % x) #make sure scientific notation is off
 
+print(df)
+
 #Plotting 3D plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
