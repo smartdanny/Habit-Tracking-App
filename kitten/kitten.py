@@ -1,6 +1,10 @@
 import sys
+# sys.path.append('./kitten.py')
 sys.path.append('./lib/')
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy
+from os.path import expanduser
+from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
+                            QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
+                            QFileDialog, QMessageBox)
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
 from mouseTrack import mouseClickAndLocation
@@ -9,6 +13,7 @@ import time
 import pandas as pd
 import numpy as np
 import math
+import string
 
 import matplotlib
 # Make sure that we are using QT5
@@ -69,7 +74,6 @@ class KeyboardPlot(MyMplCanvas):
         self.axes.set_xticks(ind)
         self.axes.set_xticklabels(unique_keys)
 
-
 class App(QMainWindow):
 
     def __init__(self):
@@ -109,6 +113,7 @@ class Home(QWidget):
         self.mouse_movement_tab = QWidget()
         self.mouse_click_tab = QWidget()
         self.keyboard_tab = QWidget()
+        self.settings_tab = QWidget()
 
         # Add tabs
         self.tabs.addTab(self.home_tab,"Home")
@@ -116,12 +121,14 @@ class Home(QWidget):
         self.tabs.addTab(self.mouse_movement_tab, "Mouse Movements")
         self.tabs.addTab(self.mouse_click_tab, "Mouse Clicks")
         self.tabs.addTab(self.keyboard_tab, "Keyboard Input")
+        self.tabs.addTab(self.settings_tab, "Settings")
 
         self.make_home_tab()
         self.make_data_select_tab()
         self.make_mouse_movement_tab()
         self.make_mouse_click_tab()
         self.make_keyboard_tab()
+        self.make_settings_tab()
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
@@ -239,10 +246,13 @@ class Home(QWidget):
         row_2.addStretch()
 
         vis_btn = QPushButton('Visualize Data', self)
+        download_btn = QPushButton('Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
+        download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
+        row_3.addWidget(download_btn)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -267,10 +277,13 @@ class Home(QWidget):
         row_2.addStretch()
 
         vis_btn = QPushButton('Visualize Data', self)
+        download_btn = QPushButton('Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_clicks(row_2))
+        download_btn.clicked.connect(lambda: self.download_data('mouseClicks.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
+        row_3.addWidget(download_btn)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -295,10 +308,13 @@ class Home(QWidget):
         row_2.addStretch()
 
         vis_btn = QPushButton('Visualize Data', self)
+        download_btn = QPushButton('Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2))
+        download_btn.clicked.connect(lambda: self.download_data('keyboard.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
+        row_3.addWidget(download_btn)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -309,47 +325,118 @@ class Home(QWidget):
 
         self.keyboard_tab.setLayout(v_box)
 
+    def make_settings_tab(self):
+
+        # kitten_lbl = QLabel(self)
+        # kitten_lbl.setText('Select default data to have checked')
+        # row_1 = QHBoxLayout()
+        # row_1.addStretch()
+        # row_1.addWidget(kitten_lbl)
+        # row_1.addStretch()
+
+        mouse_check_box = QCheckBox('mouse movements', self)
+        mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(mouse_check_box)
+        row_1.addStretch()
+
+        mouse_check_box = QCheckBox('mouse clicks', self)
+        mouse_check_box.stateChanged.connect(self.switch_mouse_click_state)
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+        row_2.addWidget(mouse_check_box)
+        row_2.addStretch()
+
+        mouse_check_box = QCheckBox('keyboard input', self)
+        mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(mouse_check_box)
+        row_3.addStretch()
+
+        mouse_check_box = QCheckBox('running programs', self)
+        mouse_check_box.stateChanged.connect(self.switch_running_program_state)
+        row_4 = QHBoxLayout()
+        row_4.addStretch()
+        row_4.addWidget(mouse_check_box)
+        row_4.addStretch()
+
+        mouse_check_box = QCheckBox('running websites', self)
+        mouse_check_box.stateChanged.connect(self.switch_running_website_state)
+        row_5 = QHBoxLayout()
+        row_5.addStretch()
+        row_5.addWidget(mouse_check_box)
+        row_5.addStretch()
+
+        data_select_btn = QPushButton('Begin Collecting Data!', self)
+        data_select_btn.clicked.connect(self.initiate_data_collection)
+        row_6 = QHBoxLayout()
+        row_6.addStretch()
+        row_6.addWidget(data_select_btn)
+        row_6.addStretch()
+
+        data_stop_btn = QPushButton('Stop Collecting Data!', self)
+        data_stop_btn.clicked.connect(self.stop_data_collection)
+        row_7 = QHBoxLayout()
+        row_7.addStretch()
+        row_7.addWidget(data_stop_btn)
+        row_7.addStretch()
+
+        v_box = QVBoxLayout()
+        v_box.addStretch(1)
+        v_box.addLayout(row_1)
+        v_box.addLayout(row_2)
+        v_box.addLayout(row_3)
+        v_box.addLayout(row_4)
+        v_box.addLayout(row_5)
+        v_box.addLayout(row_6)
+        v_box.addLayout(row_7)
+        v_box.addStretch(1) # This takes up space at the bottom.
+
+        self.settings_tab.setLayout(v_box)
+
     def plot_mouse_loc(self, row):
         if row.count() > 2:
             try:
                 row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
                 widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
                 row.addWidget(widget)
                 row.addStretch()
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_mouse_clicks(self, row):
         if row.count() > 2:
             try:
                 row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
                 widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
                 row.addWidget(widget)
                 row.addStretch()
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_keyboard_input(self, row):
         if row.count() > 2:
             try:
                 row.replaceWidget(row.itemAt(1).widget(), KeyboardPlot(QWidget(self), width=5, height=4, dpi=100))
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
                 widget = KeyboardPlot(QWidget(self), width=5, height=4, dpi=100)
                 row.addWidget(widget)
                 row.addStretch()
             except:
-                pass
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def initiate_data_collection(self):
         # Check for which boxes are ticked and start collecting data for those boxes
@@ -437,6 +524,15 @@ class Home(QWidget):
 
     def switch_running_website_state(self):
         self.running_website_selection = not self.running_website_selection
+
+    def download_data(self, data_name):
+        fileName = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\', QFileDialog.ShowDirsOnly)
+        if fileName:
+            try:
+                df = pd.read_csv('./data/' + data_name)
+                df.to_csv(fileName + '/' + data_name)
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before downloading.")
 
 
 if __name__ == '__main__':
