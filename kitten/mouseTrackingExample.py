@@ -1,13 +1,13 @@
 # this file demonstrates how to run mouseClickandLocation
 
-import mouseClickAndLocation
+import lib.mouseTrack.mouseClickAndLocation as m
 import time
 
 if __name__ == '__main__':
     # initialize all event triggers to be clear (don't record anything)
 
     # create mouseListener thread
-    mouse = mouseClickAndLocation.MOUSETHREAD()
+    mouse = m.MOUSETHREAD()
     mouse.recordScroll = False
     mouse.recordClicks = False
     mouse.recordLoc = False
