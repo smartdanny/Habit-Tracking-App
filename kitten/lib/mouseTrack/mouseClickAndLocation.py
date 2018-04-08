@@ -13,10 +13,11 @@ class MOUSETHREAD(mouse.Listener):
     Something to note is that the first entry in the time column is a timestamp of time since epoch. All other entries
     are the time in seconds since the first entry. This was done to conserve space. A function defined in
     csvToDataFrameExample takes this format and transforms it all into timestamps.
+    Here is a flowchart that shows the functionality of this class: https://drive.google.com/open?id=1nkjeEaBwpMA4k9E7MTChhutrnZnLYbYx
     """
 
     # initialize the class
-    def __init__(self):
+    def __init__(self, screenSize):
         '''
         This constructor initiates the super class and all class variables as well
         as gets the firstMoveTime and firstClickTime from the .csv files
@@ -36,8 +37,8 @@ class MOUSETHREAD(mouse.Listener):
         self.firstMoveTime = 0
 
         # Determine maximum value of X and Y
-        self.maxX = 9999
-        self.maxY = 9999
+        self.maxX = screenSize.width()
+        self.maxY = screenSize.height()
 
         # If mouseLoc.csv exists, take the first entry and assign it to firstMoveTime
         if os.path.exists(csvPath + 'mouseLoc.csv'):
@@ -59,6 +60,7 @@ class MOUSETHREAD(mouse.Listener):
         ''' This is called every time the mouse changes location. It writes new location to mouseLoc.csv '''
         self.x = x
         self.y = y
+        self.checkLimits()
         if self.recordLoc: # if recording is enabled...
             self.t = time.time() # grab the time since epoch
             print('Pointer moved to {0}'.format((self.x, self.y)) + ' at ' + str(datetime.datetime.fromtimestamp(self.t)))
@@ -69,6 +71,7 @@ class MOUSETHREAD(mouse.Listener):
         ''' This is called every time the mouse is pressed or released. It writes new location to mouseClicks.csv '''
         self.x = x
         self.y = y
+        self.checkLimits()
         self.t = round((time.time() - self.firstClickTime), 7)
         if self.recordClicks: # if recording is enabled...
             if pressed:
@@ -82,6 +85,7 @@ class MOUSETHREAD(mouse.Listener):
         ''' This function executes every time the user scrolls. However, we do not utilize it in Kitten '''
         self.x = x
         self.y = y
+        self.checkLimits()
         self.t = round(time.time(), 7)
         if self.recordScroll:
             print('Scrolled {0} at {1}'.format(

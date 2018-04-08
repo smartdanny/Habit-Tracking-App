@@ -561,7 +561,7 @@ class Home(QWidget):
         # # initialize all event triggers to be clear (don't record anything)
 
         # create mouseListener thread
-        self.mouse_movement = mouseClickAndLocation.MOUSETHREAD()
+        self.mouse_movement = mouseClickAndLocation.MOUSETHREAD(getScreenSize())
         self.mouse_movement.recordScroll = False
         self.mouse_movement.recordClicks = False
         self.mouse_movement.recordLoc = False
@@ -574,7 +574,7 @@ class Home(QWidget):
         # # initialize all event triggers to be clear (don't record anything)
 
         # create mouseListener thread
-        self.mouse_clicks = mouseClickAndLocation.MOUSETHREAD()
+        self.mouse_clicks = mouseClickAndLocation.MOUSETHREAD(getScreenSize())
         self.mouse_clicks.recordScroll = False
         self.mouse_clicks.recordClicks = False
         self.mouse_clicks.recordLoc = False
@@ -623,8 +623,15 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before downloading.")
 
+def getScreenSize():
+    ''' Returns screen size '''
+    screen = app.primaryScreen()
+    screenSize = screen.size()
+    print('Detecting resolution...\nwidth: %d \nheight: %d' % (screenSize.width(), screenSize.height()))
+    return screen.size()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    getScreenSize()
     ex = App()
     sys.exit(app.exec_())
