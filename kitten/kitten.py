@@ -79,7 +79,7 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('kitten')
-        self.setWindowIcon(QIcon('./images/kitten_16'))
+        self.setWindowIcon(QIcon('./images/logo-256x256'))
         self.setGeometry(100, 100, 500, 400)
         self.home = Home(self)
         self.setCentralWidget(self.home)
@@ -144,7 +144,7 @@ class Home(QWidget):
 
         # Add kitten image
         kitten_image_lbl = QLabel(self)
-        kitten_image_lbl.setPixmap(QPixmap('./images/kitten_image.png'))
+        kitten_image_lbl.setPixmap(QPixmap('./images/full-logo-375x135'))
         row_2 = QHBoxLayout()
         row_2.addStretch()
         row_2.addWidget(kitten_image_lbl)
