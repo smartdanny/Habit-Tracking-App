@@ -60,6 +60,7 @@ class KeyboardPlot(MyMplCanvas):
     def compute_initial_figure(self):
         keys = list(pd.read_csv('./data/keyboard.csv')['Key'])
         unique_keys = list(set(keys))
+
         freq = []
         for key in unique_keys:
             freq.append(keys.count(key))

@@ -9,17 +9,24 @@ csvPath = './data/'
 class MOUSETHREAD(mouse.Listener):
     """
     I made my own class that is the child of mouse.Listener. Every time a click, movement, or scroll occurs, the
-    appropriate function name is executed. This is in a thread, so it can happen in parallel with the calling script
+    appropriate function name is executed. This is in a thread, so it can happen in parallel with the calling script.
+    Something to note is that the first entry in the time column is a timestamp of time since epoch. All other entries
+    are the time in seconds since the first entry. This was done to conserve space. A function defined in
+    csvToDataFrameExample takes this format and transforms it all into timestamps.
     """
 
     # initialize the class
     def __init__(self):
+        '''
+        This constructor initiates the super class and all class variables as well
+        as gets the firstMoveTime and firstClickTime from the .csv files
+        '''
+
         # initializes mouse.Listener
         super().__init__(on_move = self.on_move, on_click = self.on_click, on_scroll = self.on_scroll)
         self.t = 0
         self.x = 0
         self.y = 0
-
 
         # initializes the recording booleans to false
         self.recordLoc = False
@@ -28,6 +35,11 @@ class MOUSETHREAD(mouse.Listener):
         self.firstClickTime = 0
         self.firstMoveTime = 0
 
+        # Determine maximum value of X and Y
+        self.maxX = 9999
+        self.maxY = 9999
+
+        # If mouseLoc.csv exists, take the first entry and assign it to firstMoveTime
         if os.path.exists(csvPath + 'mouseLoc.csv'):
             with open(csvPath + 'mouseLoc.csv') as f:
                 reader = c.reader(f)
@@ -35,6 +47,7 @@ class MOUSETHREAD(mouse.Listener):
                 row2 = next(reader)
                 self.firstMoveTime = float(row2[0])
 
+        # If mouseClicks.csv exists, take the first entry and assign it to firstClickTime
         if os.path.exists(csvPath + 'mouseClicks.csv'):
             with open(csvPath + 'mouseClicks.csv') as f:
                 reader2 = c.reader(f)
@@ -42,22 +55,22 @@ class MOUSETHREAD(mouse.Listener):
                 row2 = next(reader2)
                 self.firstClickTime = float(row2[0])
 
-    # called when mouse moves
     def on_move(self, x, y):
+        ''' This is called every time the mouse changes location. It writes new location to mouseLoc.csv '''
         self.x = x
         self.y = y
-        if self.recordLoc:
-            self.t = time.time()
+        if self.recordLoc: # if recording is enabled...
+            self.t = time.time() # grab the time since epoch
             print('Pointer moved to {0}'.format((self.x, self.y)) + ' at ' + str(datetime.datetime.fromtimestamp(self.t)))
-            self.t = round((self.t - self.firstMoveTime), 7)
-            self.write_csv('mouseLoc.csv', str(self.t)  + ',' + str(self.x) + ',' + str(self.y) + '\n')
+            self.t = round((self.t - self.firstMoveTime), 7) # calculate difference from first entry
+            self.write_csv('mouseLoc.csv', str(self.t)  + ',' + str(self.x) + ',' + str(self.y) + '\n') # write to .csv
 
-    # called when mouse clicks
     def on_click(self, x, y, button, pressed):
+        ''' This is called every time the mouse is pressed or released. It writes new location to mouseClicks.csv '''
         self.x = x
         self.y = y
         self.t = round((time.time() - self.firstClickTime), 7)
-        if self.recordClicks:
+        if self.recordClicks: # if recording is enabled...
             if pressed:
                 words = str(self.t) + ',' + 'p,' + str(self.x) + ',' + str(y)
             else:
@@ -65,8 +78,8 @@ class MOUSETHREAD(mouse.Listener):
             print(words)
             self.write_csv('mouseClicks.csv', words + '\n') # prints p if pressed and r if released
 
-    # called when mouse moves
     def on_scroll(self, x, y, dx, dy):
+        ''' This function executes every time the user scrolls. However, we do not utilize it in Kitten '''
         self.x = x
         self.y = y
         self.t = round(time.time(), 7)
@@ -76,8 +89,23 @@ class MOUSETHREAD(mouse.Listener):
                 (x, y)))
         # print???
 
-    # writes to .csv file in real time
+    def checkLimits(self):
+        ''' Makes sure there are no negative values or values outside resolution '''
+        if(self.x > self.maxX):
+            self.x = self.maxX
+        if(self.x < 0):
+            self.x = 0
+        if(self.y > self.maxY):
+            self.y = self.maxY
+        if(self.y < 0):
+            self.y = 0
+
     def write_csv(self, csv, words):
+        '''
+        This function is used to write to a .csv file. csv is the name of the file
+        and words is thread string written to the file
+        '''
+
         # If the file doesn't exist, make proper column titles
         if not os.path.exists(csvPath + csv):
             if(csv == 'mouseLoc.csv'):
