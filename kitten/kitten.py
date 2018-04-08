@@ -1,10 +1,9 @@
 import sys
-# sys.path.append('./kitten.py')
 sys.path.append('./lib/')
 from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
-                            QFileDialog, QMessageBox)
+                            QFileDialog, QMessageBox, QLineEdit)
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QCoreApplication
 from mouseTrack import mouseClickAndLocation
@@ -106,6 +105,10 @@ class Home(QWidget):
         self.websites = None
         self.keyboard = None
 
+        # local variables to check when data is to be collected
+        self.websites_to_record = []
+        self.programs_to_record = []
+
         # initialize tab screen
         self.tabs = QTabWidget()
         self.home_tab = QWidget()
@@ -113,6 +116,8 @@ class Home(QWidget):
         self.mouse_movement_tab = QWidget()
         self.mouse_click_tab = QWidget()
         self.keyboard_tab = QWidget()
+        self.websites_tab = QWidget()
+        self.programs_tab = QWidget()
         self.settings_tab = QWidget()
 
         # Add tabs
@@ -121,6 +126,8 @@ class Home(QWidget):
         self.tabs.addTab(self.mouse_movement_tab, "Mouse Movements")
         self.tabs.addTab(self.mouse_click_tab, "Mouse Clicks")
         self.tabs.addTab(self.keyboard_tab, "Keyboard Input")
+        self.tabs.addTab(self.websites_tab, "Websites")
+        self.tabs.addTab(self.programs_tab, "Programs")
         self.tabs.addTab(self.settings_tab, "Settings")
 
         self.make_home_tab()
@@ -128,42 +135,37 @@ class Home(QWidget):
         self.make_mouse_movement_tab()
         self.make_mouse_click_tab()
         self.make_keyboard_tab()
+        self.make_websites_tab()
+        self.make_programs_tab()
         self.make_settings_tab()
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
     def make_home_tab(self):
-        # Create welcome label
-        kitten_lbl = QLabel(self)
-        kitten_lbl.setText('Hi! Welcome to kitten :)')
-        row_1 = QHBoxLayout()
-        row_1.addStretch()
-        row_1.addWidget(kitten_lbl)
-        row_1.addStretch()
 
         # Add kitten image
         kitten_image_lbl = QLabel(self)
         kitten_image_lbl.setPixmap(QPixmap('./images/full-logo-375x135'))
-        row_2 = QHBoxLayout()
-        row_2.addStretch()
-        row_2.addWidget(kitten_image_lbl)
-        row_2.addStretch()
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(kitten_image_lbl)
+        row_1.addStretch()
+        row_1.addStretch()
 
     	# just another quit button for now
         data_select_btn = QPushButton('quit', self)
         data_select_btn.clicked.connect(QCoreApplication.instance().quit)
-        row_3 = QHBoxLayout()
-        row_3.addStretch()
-        row_3.addWidget(data_select_btn)
-        row_3.addStretch()
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+        row_2.addWidget(data_select_btn)
+        row_2.addStretch()
 
         v_box = QVBoxLayout()
         v_box.addStretch(1)
         v_box.addLayout(row_1)
+        v_box.addStretch(1)
         v_box.addLayout(row_2)
-        v_box.addLayout(row_3)
-        v_box.addStretch(1) # This takes up space at the bottom.
 
         self.home_tab.setLayout(v_box)
 
@@ -191,21 +193,26 @@ class Home(QWidget):
         row_3.addStretch()
 
         mouse_check_box = QCheckBox('running programs', self)
+        programs_le = QLineEdit()
+        programs_le.setPlaceholderText('Ex: \'slack,photoshop \' ')
         mouse_check_box.stateChanged.connect(self.switch_running_program_state)
         row_4 = QHBoxLayout()
         row_4.addStretch()
         row_4.addWidget(mouse_check_box)
-        row_4.addStretch()
+        row_4.addWidget(programs_le)
 
         mouse_check_box = QCheckBox('running websites', self)
+        websites_le = QLineEdit()
+        websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
         mouse_check_box.stateChanged.connect(self.switch_running_website_state)
         row_5 = QHBoxLayout()
         row_5.addStretch()
         row_5.addWidget(mouse_check_box)
-        row_5.addStretch()
+        row_5.addWidget(websites_le)
+        # row_5.addStretch()
 
         data_select_btn = QPushButton('Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(self.initiate_data_collection)
+        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le))
         row_6 = QHBoxLayout()
         row_6.addStretch()
         row_6.addWidget(data_select_btn)
@@ -325,6 +332,68 @@ class Home(QWidget):
 
         self.keyboard_tab.setLayout(v_box)
 
+    def make_websites_tab(self):
+        v_box = QVBoxLayout()
+
+        lbl = QLabel(self)
+        lbl.setText('Websites')
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(lbl)
+        row_1.addStretch()
+
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+
+        vis_btn = QPushButton('Visualize Data', self)
+        download_btn = QPushButton('Download Data', self)
+        # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
+        download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(vis_btn)
+        row_3.addWidget(download_btn)
+        row_3.addStretch()
+
+        v_box.addLayout(row_1)
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
+
+        self.websites_tab.setLayout(v_box)
+
+    def make_programs_tab(self):
+        v_box = QVBoxLayout()
+
+        lbl = QLabel(self)
+        lbl.setText('Programs')
+        row_1 = QHBoxLayout()
+        row_1.addStretch()
+        row_1.addWidget(lbl)
+        row_1.addStretch()
+
+        row_2 = QHBoxLayout()
+        row_2.addStretch()
+
+        vis_btn = QPushButton('Visualize Data', self)
+        download_btn = QPushButton('Download Data', self)
+        # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
+        download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(vis_btn)
+        row_3.addWidget(download_btn)
+        row_3.addStretch()
+
+        v_box.addLayout(row_1)
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
+
+        self.programs_tab.setLayout(v_box)
+
     def make_settings_tab(self):
 
         # kitten_lbl = QLabel(self)
@@ -438,7 +507,7 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
-    def initiate_data_collection(self):
+    def initiate_data_collection(self, websites_textbox, programs_textbox):
         # Check for which boxes are ticked and start collecting data for those boxes
         if self.mouse_movement_selection and self.mouse_movement is None:
             self.record_mouse_movement()
@@ -446,10 +515,29 @@ class Home(QWidget):
             self.record_mouse_clicks()
         if self.keyboard_input_selection and self.keyboard is None:
             self.record_keyboard_input()
+        
+        ## Programs
         if self.running_program_selection and self.programs is None:
+            self.programs_to_record = programs_textbox.text().split(',')
+            print("You want to record:", self.programs_to_record)
+            print("Recording NOT in sesh")
             self.record_running_programs()
+        if self.running_program_selection and self.programs is not None:
+            self.programs_to_record = programs_textbox.text().split(',')
+            print("You want to record:", self.programs_to_record)
+            print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW PROGRAMS LIST
+
+        ## Websites
         if self.running_website_selection and self.websites is None:
+            self.websites_to_record = websites_textbox.text().split(',')
+            print("You want to record:", self.websites_to_record)
+            print("Recording NOT in sesh")
             self.record_running_websites()
+        if self.running_website_selection and self.websites is not None:
+            self.websites_to_record = websites_textbox.text().split(',')
+            print("You want to record:", self.websites_to_record)
+            print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW WEBSITES LIST
+            
 
     def stop_data_collection(self):
         if self.mouse_movement is not None:
