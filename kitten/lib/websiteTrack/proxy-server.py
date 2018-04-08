@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import logging
 import datetime
 
+# Set up initial logging settings for user POST requests
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s %(message)s')
@@ -18,6 +19,9 @@ DIR = '/var/log/squid/' # file location
 FILE = 'access.log' # file name
 
 def getLines():
+    '''
+    Simply returns all the lines from /var/log/squid/access.log
+    '''
     # Open access.log with read permission
     try:
         log = open(DIR + FILE, 'r')
@@ -27,6 +31,13 @@ def getLines():
     return lines
 
 def clearLog(lines, host):
+    '''
+    This function erases all footprints left behind on the Kitten proxy log. This serves
+    two purposes:
+
+    1) Slows down the process of file bloating - access.log grows very quickly which can hinder the getLines() funciton
+    2) Assure that the next tracking session is accurate and doesn't read any prior GET requests from access.log
+    '''
     count = 0
 
     with open(DIR + FILE, 'w') as log:
@@ -44,7 +55,10 @@ def clearLog(lines, host):
     logger.info("Deleted %s lines from access.log...", str(count))
 
 def getWebsiteCount(lines, host, website_list):
-
+    '''
+    Takes the user-provided website list and compares it against all entries in access.log
+    where the IP address of the client host matches
+    '''
     # Initialize dictionary to store website visit count
     website_count = {}
 
@@ -61,7 +75,7 @@ def getWebsiteCount(lines, host, website_list):
             # Get domain
             url = line_params[6]
             output = urlparse(url)
-            domain = output[1]
+            domain = output[2]
 
             # Process the domain
             if domain.find(':') != -1:
@@ -83,7 +97,11 @@ def getWebsiteCount(lines, host, website_list):
     return website_count
 
 class CustomHTTPRequestHandler(BaseHTTPRequestHandler):
-
+    '''
+    Overrides the BaseHTTPRequestHandler class to provide a custom handler for Kitten
+    client POST requests. This handler extracts the provided user-inputted website list and
+    executes the necessary processing to return an access count per website in .csv format
+    '''
     # Handle POST request
     def do_POST(self):
         # Log the host and the port

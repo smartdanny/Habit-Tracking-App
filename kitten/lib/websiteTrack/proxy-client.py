@@ -20,6 +20,10 @@ class ProxyClient:
         self.os = platform.system()
 
     def enableProxy(self):
+        '''
+        Enables the proxy automatically through operating system settings - currently only viable for Windows.
+        This function is called at the very beginning of a tracking session.
+        '''
         if (self.os == 'Windows'):
             print("OS: " + self.os)
 
@@ -36,6 +40,10 @@ class ProxyClient:
             print("Proxy enabled...")
 
     def disableProxy(self):
+        '''
+        Disables the proxy automatically through operating system settings - currently only viable for Windows.
+        This function is called at the very end of a tracking session.
+        '''
         if (self.os == 'Windows'):
 
             INTERNET_SETTINGS = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
@@ -45,20 +53,28 @@ class ProxyClient:
             def set_key(name, value):
                 _, reg_type = winreg.QueryValueEx(INTERNET_SETTINGS, name)
                 winreg.SetValueEx(INTERNET_SETTINGS, name, 0, reg_type, value)
-                
+
             set_key('ProxyEnable', 0)
             print("Proxy disabled...")
 
     def getWebsites(self):
+        '''
+        Simply retrieves user input from GUI - currently employs no validation techniques
+        '''
         self.websites = input("Please enter the websites that you would like to track the usage of: ")
 
     def getLog(self):
+        '''
+        Sends an HTTP POST request to the Kitten server that holds all the proxy logging informationself.
+        Writes the response into the websiteLog.csv that is held with the user's data folder.
+        '''
+        print("Sending POST request to server...")
         try:
             response = requests.post('http://' + self.server_host + ':' + str(self.server_port), data=self.websites)
         except ConnectionError:
             print("Unable to connect with Kitten server...")
-
-        with open('website_log.csv', 'a') as log:
+        print("Received response...")
+        with open('../../data/websiteLog.csv', 'w') as log:
             log.write(response.text)
 
 if __name__ == '__main__':
@@ -70,5 +86,6 @@ if __name__ == '__main__':
         print(i+1)
         time.sleep(1)
     client.disableProxy() # once user stops session, the proxy settings will be disabled
+    time.sleep(1)
     client.getLog() # client then sends POST request that receives csv data
     print("Logging information added to website_log.csv...")
