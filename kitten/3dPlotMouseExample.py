@@ -8,6 +8,7 @@ as well as csvToDataFrame in order to create a df.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.widgets import Slider, Button, RadioButtons
 import lib.mouseTrack.csvToDataFrameExample as csv
 
 # EXAMPLE
@@ -21,4 +22,6 @@ print(df)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 plt.plot(df['x'], df['y'], zs=df['Time'])
+# startTime = Slider('Time', 'Start Time', min(df['Time']), max(df['Time']), valinit=min(df['Time']))
+
 plt.show()

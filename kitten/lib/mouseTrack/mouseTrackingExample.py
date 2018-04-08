@@ -1,4 +1,4 @@
-# this file demonstrates how to run mouseClickandLocation
+''' This script exemplifies the correct initiation and useage of the MOUSETHREAD class '''
 
 import lib.mouseTrack.mouseClickAndLocation as m
 import time
