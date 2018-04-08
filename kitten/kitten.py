@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QA
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
                             QFileDialog, QMessageBox, QLineEdit)
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import pyqtSlot, QCoreApplication
+from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
 import time
@@ -153,21 +153,33 @@ class Home(QWidget):
         row_1.addStretch()
         row_1.addWidget(kitten_image_lbl)
         row_1.addStretch()
-        row_1.addStretch()
 
-    	# just another quit button for now
-        data_select_btn = QPushButton('quit', self)
-        data_select_btn.clicked.connect(QCoreApplication.instance().quit)
+        # Add about text
+        about_text = QLabel("Kitten is a general habit-tracking application with a multitude of modularized tracking features including\n" +
+                            "recording mouse movement, key presses, time spent on computer applications, and time spent on websites.\n" +
+                            "Kitten's functionality was created to support and benefit gamers, teachers, parents, the typical Internet and computer\n" +
+                            "user, and more.")
+        about_text.setAlignment(Qt.AlignCenter)
         row_2 = QHBoxLayout()
         row_2.addStretch()
-        row_2.addWidget(data_select_btn)
+        row_2.addWidget(about_text)
         row_2.addStretch()
+
+    	# just another quit button for now
+        data_select_btn = QPushButton('Quit', self)
+        data_select_btn.clicked.connect(QCoreApplication.instance().quit)
+        row_3 = QHBoxLayout()
+        row_3.addStretch()
+        row_3.addWidget(data_select_btn)
+        row_3.addStretch()
 
         v_box = QVBoxLayout()
         v_box.addStretch(1)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
+        v_box.addStretch(1)
+        v_box.addLayout(row_3)
 
         self.home_tab.setLayout(v_box)
 
