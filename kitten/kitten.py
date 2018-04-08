@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 import math
 import string
+import qtawesome as qta
 
 import matplotlib
 # Make sure that we are using QT5
@@ -119,17 +120,17 @@ class Home(QWidget):
         self.keyboard_tab = QWidget()
         self.websites_tab = QWidget()
         self.programs_tab = QWidget()
-        self.settings_tab = QWidget()
+        self.help_tab = QWidget()
 
         # Add tabs
-        self.tabs.addTab(self.home_tab,"Home")
-        self.tabs.addTab(self.data_select_tab,"Data Select")
-        self.tabs.addTab(self.mouse_movement_tab, "Mouse Movements")
-        self.tabs.addTab(self.mouse_click_tab, "Mouse Clicks")
-        self.tabs.addTab(self.keyboard_tab, "Keyboard Input")
-        self.tabs.addTab(self.websites_tab, "Websites")
-        self.tabs.addTab(self.programs_tab, "Programs")
-        self.tabs.addTab(self.settings_tab, "Settings")
+        self.tabs.addTab(self.home_tab, qta.icon('fa.home'),"Home")
+        self.tabs.addTab(self.data_select_tab, qta.icon('fa.list'), "Data Select")
+        self.tabs.addTab(self.mouse_movement_tab, qta.icon('fa.mouse-pointer'),"Mouse Movements")
+        self.tabs.addTab(self.mouse_click_tab, qta.icon('fa.mouse-pointer'), "Mouse Clicks")
+        self.tabs.addTab(self.keyboard_tab, qta.icon('fa.th'),"Keyboard")
+        self.tabs.addTab(self.websites_tab, qta.icon('fa.globe'),"Websites")
+        self.tabs.addTab(self.programs_tab, qta.icon('fa.desktop'),"Programs")
+        self.tabs.addTab(self.help_tab, qta.icon('fa.question-circle'),"Help")
 
         self.make_home_tab()
         self.make_data_select_tab()
@@ -138,7 +139,7 @@ class Home(QWidget):
         self.make_keyboard_tab()
         self.make_websites_tab()
         self.make_programs_tab()
-        self.make_settings_tab()
+        self.make_help_tab()
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
@@ -172,28 +173,28 @@ class Home(QWidget):
 
     def make_data_select_tab(self):
 
-        mouse_check_box = QCheckBox('mouse movements', self)
+        mouse_check_box = QCheckBox('Mouse Movements', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
         row_1 = QHBoxLayout()
         row_1.addStretch()
         row_1.addWidget(mouse_check_box)
         row_1.addStretch()
 
-        mouse_check_box = QCheckBox('mouse clicks', self)
+        mouse_check_box = QCheckBox('Mouse Clicks', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_click_state)
         row_2 = QHBoxLayout()
         row_2.addStretch()
         row_2.addWidget(mouse_check_box)
         row_2.addStretch()
 
-        mouse_check_box = QCheckBox('keyboard input', self)
+        mouse_check_box = QCheckBox('Keyboard', self)
         mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(mouse_check_box)
         row_3.addStretch()
 
-        mouse_check_box = QCheckBox('running programs', self)
+        mouse_check_box = QCheckBox('Programs', self)
         programs_le = QLineEdit()
         programs_le.setPlaceholderText('Ex: \'slack,photoshop \' ')
         mouse_check_box.stateChanged.connect(self.switch_running_program_state)
@@ -202,7 +203,7 @@ class Home(QWidget):
         row_4.addWidget(mouse_check_box)
         row_4.addWidget(programs_le)
 
-        mouse_check_box = QCheckBox('running websites', self)
+        mouse_check_box = QCheckBox('Websites', self)
         websites_le = QLineEdit()
         websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
         mouse_check_box.stateChanged.connect(self.switch_running_website_state)
@@ -212,14 +213,14 @@ class Home(QWidget):
         row_5.addWidget(websites_le)
         # row_5.addStretch()
 
-        data_select_btn = QPushButton('Begin Collecting Data!', self)
+        data_select_btn = QPushButton(qta.icon('fa.play'), 'Begin Collecting Data!', self)
         data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le))
         row_6 = QHBoxLayout()
         row_6.addStretch()
         row_6.addWidget(data_select_btn)
         row_6.addStretch()
 
-        data_stop_btn = QPushButton('Stop Collecting Data!', self)
+        data_stop_btn = QPushButton(qta.icon('fa.stop'), 'Stop Collecting Data!', self)
         data_stop_btn.clicked.connect(self.stop_data_collection)
         row_7 = QHBoxLayout()
         row_7.addStretch()
@@ -253,8 +254,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        download_btn = QPushButton('Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
         row_3 = QHBoxLayout()
@@ -284,8 +285,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        download_btn = QPushButton('Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_clicks(row_2))
         download_btn.clicked.connect(lambda: self.download_data('mouseClicks.csv'))
         row_3 = QHBoxLayout()
@@ -315,8 +316,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        download_btn = QPushButton('Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2))
         download_btn.clicked.connect(lambda: self.download_data('keyboard.csv'))
         row_3 = QHBoxLayout()
@@ -346,8 +347,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        download_btn = QPushButton('Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
         # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
         download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
         row_3 = QHBoxLayout()
@@ -377,8 +378,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton('Visualize Data', self)
-        download_btn = QPushButton('Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
         # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
         download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
         row_3 = QHBoxLayout()
@@ -395,7 +396,7 @@ class Home(QWidget):
 
         self.programs_tab.setLayout(v_box)
 
-    def make_settings_tab(self):
+    def make_help_tab(self):
 
         # kitten_lbl = QLabel(self)
         # kitten_lbl.setText('Select default data to have checked')
@@ -464,7 +465,7 @@ class Home(QWidget):
         v_box.addLayout(row_7)
         v_box.addStretch(1) # This takes up space at the bottom.
 
-        self.settings_tab.setLayout(v_box)
+        self.help_tab.setLayout(v_box)
 
     def plot_mouse_loc(self, row):
         if row.count() > 2:
@@ -516,7 +517,7 @@ class Home(QWidget):
             self.record_mouse_clicks()
         if self.keyboard_input_selection and self.keyboard is None:
             self.record_keyboard_input()
-        
+
         ## Programs
         if self.running_program_selection and self.programs is None:
             self.programs_to_record = programs_textbox.text().split(',')
@@ -538,7 +539,7 @@ class Home(QWidget):
             self.websites_to_record = websites_textbox.text().split(',')
             print("You want to record:", self.websites_to_record)
             print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW WEBSITES LIST
-            
+
 
     def stop_data_collection(self):
         if self.mouse_movement is not None:
