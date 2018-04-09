@@ -73,7 +73,7 @@ def getWebsiteCount(lines, host, website_list):
         if client_ip == host:
 
             # Get domain
-            url = line_params[6]
+            url = line_params[3]
             output = urlparse(url)
             domain = output[2]
 
