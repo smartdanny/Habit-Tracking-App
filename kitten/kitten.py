@@ -371,9 +371,12 @@ class Home(QWidget):
 
         data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
         data_stop_btn.setEnabled(False)
+
+
         data_select_btn = QPushButton(qta.icon('fa.play',color='green'), 'Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le, data_stop_btn))
-        data_stop_btn.clicked.connect(lambda: self.stop_data_collection(data_stop_btn))
+
+        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le, data_stop_btn, data_select_btn))
+        data_stop_btn.clicked.connect(lambda: self.stop_data_collection(data_stop_btn, data_select_btn))
         row_6 = QHBoxLayout()
         row_6.addStretch()
         row_6.addWidget(data_select_btn)
@@ -609,7 +612,7 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
-    def initiate_data_collection(self, websites_textbox, programs_textbox, data_stop_btn):
+    def initiate_data_collection(self, websites_textbox, programs_textbox, data_stop_btn, data_select_btn):
         # Check for which boxes are ticked and start collecting data for those boxes
         if self.mouse_movement_selection and self.mouse_movement is None:
             self.record_mouse_movement()
@@ -640,10 +643,11 @@ class Home(QWidget):
             print("You want to record:", self.websites_to_record)
             print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW WEBSITES LIST
 
+        data_select_btn.setEnabled(False)
         data_stop_btn.setEnabled(True)
 
 
-    def stop_data_collection(self, data_stop_btn):
+    def stop_data_collection(self, data_stop_btn, data_select_btn):
         if self.mouse_movement is not None:
             self.mouse_movement.recordLoc = False
             self.mouse_movement = None
@@ -660,6 +664,7 @@ class Home(QWidget):
         if self.keyboard is not None:
             self.keyboard = None
         data_stop_btn.setEnabled(False)
+        data_select_btn.setEnabled(True)
 
     def record_mouse_movement(self):
         # # initialize all event triggers to be clear (don't record anything)
