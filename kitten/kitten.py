@@ -3,8 +3,8 @@ sys.path.append('./lib/')
 from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
-                            QFileDialog, QMessageBox, QLineEdit)
-from PyQt5.QtGui import QIcon, QPixmap
+                            QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog)
+from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
@@ -75,16 +75,119 @@ class KeyboardPlot(MyMplCanvas):
         self.axes.set_xticks(ind)
         self.axes.set_xticklabels(unique_keys)
 
+class AboutDialog(QDialog):
+
+    def __init__(self):
+        super().__init__()
+
+        # Set title, icon, and size
+        self.setWindowIcon(QIcon('./images/logo-256x256'))
+        self.setWindowTitle("About")
+        self.setWindowModality(Qt.ApplicationModal)
+        self.resize(625, 250)
+
+        # Create About text
+        about_text = QLabel('''
+        Kitten is a general habit-tracking application with a multitude of
+        modularized tracking features including recording mouse movement,
+        key presses, time spent on computer applications, and time spent on
+        websites. Kitten's functionality was created to support and benefit
+        gamers, teachers, parents, the typical Internet and computer
+        user, and more.
+        ''')
+        about_text.setAlignment(Qt.AlignCenter)
+
+        # Create first row
+        about_row_1 = QHBoxLayout()
+        about_row_1.addStretch()
+        about_row_1.addWidget(about_text)
+        about_row_1.addStretch()
+
+        # Create OK button
+        about_ok_btn = QPushButton("OK")
+        about_ok_btn.clicked.connect(self.close)
+
+        # Create second row
+        about_row_2 = QHBoxLayout()
+        about_row_2.addStretch()
+        about_row_2.addWidget(about_ok_btn)
+        about_row_2.addStretch()
+
+        # Vertical layout
+        about_v_box = QVBoxLayout()
+        about_v_box.addLayout(about_row_1)
+        about_v_box.addStretch(1)
+        about_v_box.addLayout(about_row_2)
+        about_v_box.addStretch(1)
+        self.setLayout(about_v_box)
+
+        self.setStyleSheet('''
+        QLabel, QPushButton {
+            font: 11pt Myriad Pro;
+            color: black;
+        }
+        ''')
+
 class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('kitten')
+
+        # Set title
+        self.setWindowTitle('Kitten')
+
+        # Set logo icon
         self.setWindowIcon(QIcon('./images/logo-256x256'))
-        self.setGeometry(100, 100, 500, 400)
+
+        # Resize and center the window
+        self.resize(925, 600);
+        qtRectangle = self.frameGeometry()
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        qtRectangle.moveCenter(centerPoint)
+        self.move(qtRectangle.topLeft())
+
+        # Create stylsheet
+        self.setStyleSheet('''
+        QLabel#subtitle {
+            font: bold Myriad Pro;
+            font-size: 30px;
+            color: #E5943C;
+        }
+        QLabel, QPushButton {
+            font: 11pt Myriad Pro;
+            color: black;
+        }
+        QTabBar::tab {
+        background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                    stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                    stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+        border: 1px solid #C4C4C3;
+        border-bottom-color: #C2C7CB; /* same as the pane color */
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        min-width: 8ex;
+        padding: 2px;
+        }
+        QTabBar::tab:selected, QTabBar::tab:hover {
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                    stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                    stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+        }
+        QTabBar::tab:selected {
+            border-color: #9B9B9B;
+            border-bottom-color: #C2C7CB; /* same as pane color */
+        }
+        QTabBar::tab:!selected {
+            margin-top: 2px; /* make non-selected tabs look smaller */
+        }
+        QPushButton {
+
+        }
+        ''')
+
+        # Show the window
         self.home = Home(self)
         self.setCentralWidget(self.home)
-
         self.show()
 
 class Home(QWidget):
@@ -146,6 +249,12 @@ class Home(QWidget):
 
     def make_home_tab(self):
 
+        # Add above border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        row_0 = QHBoxLayout()
+        row_0.addWidget(border_top)
+
         # Add kitten image
         kitten_image_lbl = QLabel(self)
         kitten_image_lbl.setPixmap(QPixmap('./images/full-logo-375x135'))
@@ -155,35 +264,61 @@ class Home(QWidget):
         row_1.addStretch()
 
         # Add about text
-        about_text = QLabel("Kitten is a general habit-tracking application with a multitude of modularized tracking features including\n" +
-                            "recording mouse movement, key presses, time spent on computer applications, and time spent on websites.\n" +
-                            "Kitten's functionality was created to support and benefit gamers, teachers, parents, the typical Internet and computer\n" +
-                            "user, and more.")
+        about_text = QLabel('A Habit Tracking Application')
         about_text.setAlignment(Qt.AlignCenter)
+        about_text.setObjectName("subtitle")
         row_2 = QHBoxLayout()
         row_2.addStretch()
         row_2.addWidget(about_text)
         row_2.addStretch()
 
-    	# just another quit button for now
-        data_select_btn = QPushButton('Quit', self)
-        data_select_btn.clicked.connect(QCoreApplication.instance().quit)
+    	# Just another quit button for now
+        quit_btn = QPushButton('Quit', self)
+        quit_btn.clicked.connect(QCoreApplication.instance().quit)
+
+        # About button and dialog modal
+        about_btn = QPushButton('About', self)
+        about_dialog = AboutDialog()
+        about_btn.clicked.connect(lambda: about_dialog.exec_())
+
+        # Row 3 buttons
         row_3 = QHBoxLayout()
         row_3.addStretch()
-        row_3.addWidget(data_select_btn)
+        row_3.addWidget(about_btn)
+        row_3.addWidget(quit_btn)
         row_3.addStretch()
 
+        # add version number at the bottom of the GUI
+        version_number = QLabel("1.0.0")
+        version_number.setAlignment(Qt.AlignRight)
+        row_4 = QHBoxLayout()
+        row_4.addWidget(version_number)
+
+        # Add above border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        row_5 = QHBoxLayout()
+        row_5.addWidget(border_bottom)
+
         v_box = QVBoxLayout()
+        v_box.addLayout(row_0)
         v_box.addStretch(1)
         v_box.addLayout(row_1)
-        v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
         v_box.addLayout(row_3)
+        v_box.addLayout(row_4)
+        v_box.addLayout(row_5)
 
         self.home_tab.setLayout(v_box)
 
     def make_data_select_tab(self):
+
+        data_select_title = QLabel('Data Select', self)
+        row_0 = QHBoxLayout()
+        row_0.addStretch()
+        row_0.addWidget(data_select_title)
+        row_0.addStretch()
 
         mouse_check_box = QCheckBox('Mouse Movements', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
@@ -227,27 +362,25 @@ class Home(QWidget):
 
         data_select_btn = QPushButton(qta.icon('fa.play'), 'Begin Collecting Data!', self)
         data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le))
+        data_stop_btn = QPushButton(qta.icon('fa.stop'), 'Stop Collecting Data!', self)
+        data_stop_btn.clicked.connect(self.stop_data_collection)
         row_6 = QHBoxLayout()
         row_6.addStretch()
         row_6.addWidget(data_select_btn)
+        row_6.addWidget(data_stop_btn)
         row_6.addStretch()
 
-        data_stop_btn = QPushButton(qta.icon('fa.stop'), 'Stop Collecting Data!', self)
-        data_stop_btn.clicked.connect(self.stop_data_collection)
-        row_7 = QHBoxLayout()
-        row_7.addStretch()
-        row_7.addWidget(data_stop_btn)
-        row_7.addStretch()
-
         v_box = QVBoxLayout()
+        v_box.addStretch(1)
+        v_box.addLayout(row_0)
         v_box.addStretch(1)
         v_box.addLayout(row_1)
         v_box.addLayout(row_2)
         v_box.addLayout(row_3)
         v_box.addLayout(row_4)
         v_box.addLayout(row_5)
+        v_box.addStretch(1)
         v_box.addLayout(row_6)
-        v_box.addLayout(row_7)
         v_box.addStretch(1) # This takes up space at the bottom.
 
         self.data_select_tab.setLayout(v_box)
@@ -319,7 +452,7 @@ class Home(QWidget):
         v_box = QVBoxLayout()
 
         lbl = QLabel(self)
-        lbl.setText('Keyboard Input')
+        lbl.setText('Keyboard')
         row_1 = QHBoxLayout()
         row_1.addStretch()
         row_1.addWidget(lbl)
@@ -417,35 +550,35 @@ class Home(QWidget):
         # row_1.addWidget(kitten_lbl)
         # row_1.addStretch()
 
-        mouse_check_box = QCheckBox('mouse movements', self)
+        mouse_check_box = QCheckBox('Mouse Movements', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
         row_1 = QHBoxLayout()
         row_1.addStretch()
         row_1.addWidget(mouse_check_box)
         row_1.addStretch()
 
-        mouse_check_box = QCheckBox('mouse clicks', self)
+        mouse_check_box = QCheckBox('Mouse Clicks', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_click_state)
         row_2 = QHBoxLayout()
         row_2.addStretch()
         row_2.addWidget(mouse_check_box)
         row_2.addStretch()
 
-        mouse_check_box = QCheckBox('keyboard input', self)
+        mouse_check_box = QCheckBox('Keyboard', self)
         mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(mouse_check_box)
         row_3.addStretch()
 
-        mouse_check_box = QCheckBox('running programs', self)
+        mouse_check_box = QCheckBox('Running Programs', self)
         mouse_check_box.stateChanged.connect(self.switch_running_program_state)
         row_4 = QHBoxLayout()
         row_4.addStretch()
         row_4.addWidget(mouse_check_box)
         row_4.addStretch()
 
-        mouse_check_box = QCheckBox('running websites', self)
+        mouse_check_box = QCheckBox('Running Websites', self)
         mouse_check_box.stateChanged.connect(self.switch_running_website_state)
         row_5 = QHBoxLayout()
         row_5.addStretch()
