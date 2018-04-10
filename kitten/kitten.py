@@ -3,18 +3,19 @@ sys.path.append('./lib/')
 from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
-                            QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog)
+                            QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog, QTableWidget,
+                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem)
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
+from websiteTrack import proxyClient
 import time
 import pandas as pd
 import numpy as np
 import math
 import string
 import qtawesome as qta
-
 import matplotlib
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
@@ -284,9 +285,14 @@ class Home(QWidget):
         about_dialog = AboutDialog()
         about_btn.clicked.connect(lambda: about_dialog.exec_())
 
+        # Customize Home button
+        customize_btn = QPushButton(qta.icon('fa.cog'), 'Customize', self)
+        customize_btn.clicked.connect(lambda: about_dialog.exec_())
+
         # Row 3 buttons
         row_3 = QHBoxLayout()
         row_3.addStretch()
+        row_3.addWidget(customize_btn)
         row_3.addWidget(about_btn)
         row_3.addWidget(quit_btn)
         row_3.addStretch()
@@ -330,44 +336,38 @@ class Home(QWidget):
         border_row.addWidget(tab_title_border)
         border_row.addStretch()
 
-        mouse_check_box = QCheckBox('Mouse Movements', self)
-        mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
-        row_1 = QHBoxLayout()
-        row_1.addStretch()
-        row_1.addWidget(mouse_check_box)
-        row_1.addStretch()
+        data_layout = QGridLayout()
+        data_layout.setColumnStretch(0, 4)
+        data_layout.setColumnStretch(2, 7)
 
-        mouse_check_box = QCheckBox('Mouse Clicks', self)
-        mouse_check_box.stateChanged.connect(self.switch_mouse_click_state)
-        row_2 = QHBoxLayout()
-        row_2.addStretch()
-        row_2.addWidget(mouse_check_box)
-        row_2.addStretch()
 
-        mouse_check_box = QCheckBox('Keyboard', self)
-        mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
-        row_3 = QHBoxLayout()
-        row_3.addStretch()
-        row_3.addWidget(mouse_check_box)
-        row_3.addStretch()
+        mouse_movements_check_box = QCheckBox('Mouse Movements', self)
+        mouse_movements_check_box.stateChanged.connect(self.switch_mouse_movement_state)
+        data_layout.addWidget(mouse_movements_check_box, 0, 1)
+        data_layout.addWidget(QLabel(' '), 1, 1)
 
-        mouse_check_box = QCheckBox('Programs', self)
+        mouse_clicks_check_box = QCheckBox('Mouse Clicks', self)
+        mouse_clicks_check_box.stateChanged.connect(self.switch_mouse_click_state)
+        data_layout.addWidget(mouse_clicks_check_box, 2, 1)
+        data_layout.addWidget(QLabel(' '), 3, 1)
+
+        keyboard_check_box = QCheckBox('Keyboard', self)
+        keyboard_check_box.stateChanged.connect(self.switch_keyboard_input_state)
+        data_layout.addWidget(keyboard_check_box, 4, 1)
+        data_layout.addWidget(QLabel(' '), 5, 1)
+
+        programs_check_box = QCheckBox('Programs', self)
         programs_le = QLineEdit()
         programs_le.setPlaceholderText('Ex: \'slack,photoshop \' ')
-        mouse_check_box.stateChanged.connect(self.switch_running_program_state)
-        row_4 = QHBoxLayout()
-        row_4.addStretch()
-        row_4.addWidget(mouse_check_box)
-        row_4.addWidget(programs_le)
+        programs_check_box.stateChanged.connect(self.switch_running_program_state)
+        data_layout.addWidget(programs_check_box, 6, 1)
+        data_layout.addWidget(QLabel(' '), 7, 1)
 
-        mouse_check_box = QCheckBox('Websites', self)
-        websites_le = QLineEdit()
-        websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
-        mouse_check_box.stateChanged.connect(self.switch_running_website_state)
-        row_5 = QHBoxLayout()
-        row_5.addStretch()
-        row_5.addWidget(mouse_check_box)
-        row_5.addWidget(websites_le)
+        websites_check_box = QCheckBox('Websites', self)
+        self.websites_le = QLineEdit()
+        self.websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
+        websites_check_box.stateChanged.connect(self.switch_running_website_state)
+        data_layout.addWidget(websites_check_box, 8, 1)
 
         data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
         data_stop_btn.setEnabled(False)
@@ -384,11 +384,7 @@ class Home(QWidget):
         v_box.addLayout(row_0)
         v_box.addLayout(border_row)
         v_box.addStretch(1)
-        v_box.addLayout(row_1)
-        v_box.addLayout(row_2)
-        v_box.addLayout(row_3)
-        v_box.addLayout(row_4)
-        v_box.addLayout(row_5)
+        v_box.addLayout(data_layout)
         v_box.addStretch(1)
         v_box.addLayout(row_6)
         v_box.addStretch(1) # This takes up space at the bottom.
@@ -657,6 +653,9 @@ class Home(QWidget):
             self.programs = None
         if self.websites is not None:
             self.websites = None
+            self.client.disableProxy()
+            time.sleep(1)
+            client.getLog()
         if self.keyboard is not None:
             self.keyboard = None
         data_stop_btn.setEnabled(False)
@@ -700,6 +699,9 @@ class Home(QWidget):
 
     def record_running_websites(self):
         print('Recording running websites')
+        self.client = ProxyClient('167.99.61.206', 8080)
+        self.client.websites = self.websites_le.text()
+        self.client.enableProxy()
 
     # Functions used to change the state of whether or not user wants data recorded #
     # Used in check boxes #
