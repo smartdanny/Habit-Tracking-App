@@ -157,6 +157,9 @@ class App(QMainWindow):
             font: 11pt Myriad Pro;
             color: black;
         }
+        QLabel#tab_title {
+            font: 30px;
+        }
         QTabBar::tab {
         background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                     stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
@@ -315,10 +318,17 @@ class Home(QWidget):
     def make_data_select_tab(self):
 
         data_select_title = QLabel('Data Select', self)
+        data_select_title.setObjectName('tab_title')
+        data_select_title.setAlignment(Qt.AlignLeft)
         row_0 = QHBoxLayout()
-        row_0.addStretch()
         row_0.addWidget(data_select_title)
         row_0.addStretch()
+
+        tab_title_border = QLabel(self)
+        tab_title_border.setPixmap(QPixmap('./images/tab-title-border.png'))
+        border_row = QHBoxLayout()
+        border_row.addWidget(tab_title_border)
+        border_row.addStretch()
 
         mouse_check_box = QCheckBox('Mouse Movements', self)
         mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
@@ -358,12 +368,12 @@ class Home(QWidget):
         row_5.addStretch()
         row_5.addWidget(mouse_check_box)
         row_5.addWidget(websites_le)
-        # row_5.addStretch()
 
-        data_select_btn = QPushButton(qta.icon('fa.play'), 'Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le))
-        data_stop_btn = QPushButton(qta.icon('fa.stop'), 'Stop Collecting Data!', self)
-        data_stop_btn.clicked.connect(self.stop_data_collection)
+        data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
+        data_stop_btn.setEnabled(False)
+        data_select_btn = QPushButton(qta.icon('fa.play',color='green'), 'Begin Collecting Data!', self)
+        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le, data_stop_btn))
+        data_stop_btn.clicked.connect(lambda: self.stop_data_collection(data_stop_btn))
         row_6 = QHBoxLayout()
         row_6.addStretch()
         row_6.addWidget(data_select_btn)
@@ -371,8 +381,8 @@ class Home(QWidget):
         row_6.addStretch()
 
         v_box = QVBoxLayout()
-        v_box.addStretch(1)
         v_box.addLayout(row_0)
+        v_box.addLayout(border_row)
         v_box.addStretch(1)
         v_box.addLayout(row_1)
         v_box.addLayout(row_2)
@@ -399,8 +409,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
         row_3 = QHBoxLayout()
@@ -430,8 +440,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_clicks(row_2))
         download_btn.clicked.connect(lambda: self.download_data('mouseClicks.csv'))
         row_3 = QHBoxLayout()
@@ -461,8 +471,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2))
         download_btn.clicked.connect(lambda: self.download_data('keyboard.csv'))
         row_3 = QHBoxLayout()
@@ -492,8 +502,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
         download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
         row_3 = QHBoxLayout()
@@ -523,8 +533,8 @@ class Home(QWidget):
         row_2 = QHBoxLayout()
         row_2.addStretch()
 
-        vis_btn = QPushButton(qta.icon('fa.pie-chart'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download'),'Download Data', self)
+        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
+        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
         download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
         row_3 = QHBoxLayout()
@@ -543,71 +553,16 @@ class Home(QWidget):
 
     def make_help_tab(self):
 
-        # kitten_lbl = QLabel(self)
-        # kitten_lbl.setText('Select default data to have checked')
-        # row_1 = QHBoxLayout()
-        # row_1.addStretch()
-        # row_1.addWidget(kitten_lbl)
-        # row_1.addStretch()
-
-        mouse_check_box = QCheckBox('Mouse Movements', self)
-        mouse_check_box.stateChanged.connect(self.switch_mouse_movement_state)
+        help_lbl = QLabel(self)
+        help_lbl.setText('Help')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(mouse_check_box)
+        row_1.addWidget(help_lbl)
         row_1.addStretch()
-
-        mouse_check_box = QCheckBox('Mouse Clicks', self)
-        mouse_check_box.stateChanged.connect(self.switch_mouse_click_state)
-        row_2 = QHBoxLayout()
-        row_2.addStretch()
-        row_2.addWidget(mouse_check_box)
-        row_2.addStretch()
-
-        mouse_check_box = QCheckBox('Keyboard', self)
-        mouse_check_box.stateChanged.connect(self.switch_keyboard_input_state)
-        row_3 = QHBoxLayout()
-        row_3.addStretch()
-        row_3.addWidget(mouse_check_box)
-        row_3.addStretch()
-
-        mouse_check_box = QCheckBox('Running Programs', self)
-        mouse_check_box.stateChanged.connect(self.switch_running_program_state)
-        row_4 = QHBoxLayout()
-        row_4.addStretch()
-        row_4.addWidget(mouse_check_box)
-        row_4.addStretch()
-
-        mouse_check_box = QCheckBox('Running Websites', self)
-        mouse_check_box.stateChanged.connect(self.switch_running_website_state)
-        row_5 = QHBoxLayout()
-        row_5.addStretch()
-        row_5.addWidget(mouse_check_box)
-        row_5.addStretch()
-
-        data_select_btn = QPushButton('Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(self.initiate_data_collection)
-        row_6 = QHBoxLayout()
-        row_6.addStretch()
-        row_6.addWidget(data_select_btn)
-        row_6.addStretch()
-
-        data_stop_btn = QPushButton('Stop Collecting Data!', self)
-        data_stop_btn.clicked.connect(self.stop_data_collection)
-        row_7 = QHBoxLayout()
-        row_7.addStretch()
-        row_7.addWidget(data_stop_btn)
-        row_7.addStretch()
 
         v_box = QVBoxLayout()
         v_box.addStretch(1)
         v_box.addLayout(row_1)
-        v_box.addLayout(row_2)
-        v_box.addLayout(row_3)
-        v_box.addLayout(row_4)
-        v_box.addLayout(row_5)
-        v_box.addLayout(row_6)
-        v_box.addLayout(row_7)
         v_box.addStretch(1) # This takes up space at the bottom.
 
         self.help_tab.setLayout(v_box)
@@ -654,7 +609,7 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
-    def initiate_data_collection(self, websites_textbox, programs_textbox):
+    def initiate_data_collection(self, websites_textbox, programs_textbox, data_stop_btn):
         # Check for which boxes are ticked and start collecting data for those boxes
         if self.mouse_movement_selection and self.mouse_movement is None:
             self.record_mouse_movement()
@@ -685,8 +640,10 @@ class Home(QWidget):
             print("You want to record:", self.websites_to_record)
             print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW WEBSITES LIST
 
+        data_stop_btn.setEnabled(True)
 
-    def stop_data_collection(self):
+
+    def stop_data_collection(self, data_stop_btn):
         if self.mouse_movement is not None:
             self.mouse_movement.recordLoc = False
             self.mouse_movement = None
@@ -702,6 +659,7 @@ class Home(QWidget):
             self.websites = None
         if self.keyboard is not None:
             self.keyboard = None
+        data_stop_btn.setEnabled(False)
 
     def record_mouse_movement(self):
         # # initialize all event triggers to be clear (don't record anything)
