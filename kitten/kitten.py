@@ -36,14 +36,11 @@ class MyMplCanvas(FigureCanvas):
             fig = self.compute_website()
         elif type == 'programs':
             fig = self.compute_programs()
-        else:
+        else: # default to mouse graph -- likely unnecessary
             fig = self.compute_mouse()
         FigureCanvas.__init__(self, fig)
         FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding, QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
-    def compute_initial(self):
-        pass
 
     def compute_mouse(self):
         loc = pd.read_csv('./data/mouseLoc.csv')
@@ -54,7 +51,7 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         sns.kdeplot(loc.x, loc.y, cmap="Oranges", shade=True)
         plt.scatter(clicks.x, clicks.y, c="w", marker="+")
-        g = plt.gcf()
+        g = plt.gcf()  # get current figure
         return g
 
     def compute_keyboard(self):
@@ -62,6 +59,7 @@ class MyMplCanvas(FigureCanvas):
         # translate keys to image coordinates
         d= []
         for k in keys['Key']:
+            print(k)
             if "space" in k:
                 d.append((325,225))
             elif "a" in k:
@@ -126,7 +124,7 @@ class MyMplCanvas(FigureCanvas):
         sns.kdeplot(df.x, df.y, shade=True, cmap="Oranges", shade_lowest=False, alpha=0.7)
         keyboard = mpimg.imread('./images/keyboard.png')
         plt.imshow(keyboard)
-        g = plt.gcf()
+        g = plt.gcf() # get current figure
         return g
 
     def compute_website(self):
@@ -138,10 +136,10 @@ class MyMplCanvas(FigureCanvas):
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
-        my_circle=plt.Circle( (0,0), 0.7, color='white')
+        cmap = matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+        my_circle = plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=websites, colors=cmap)
-        g=plt.gcf()
+        g = plt.gcf() # get current figure
         g.gca().add_artist(my_circle)
         return g
         
@@ -157,8 +155,8 @@ class MyMplCanvas(FigureCanvas):
         cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle=plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=apps, colors=cmap)
-        g=plt.gcf()
-        g.gca().add_artist(my_circle)
+        g = plt.gcf() # get current figure
+        g.gca().add_artist(my_circle) # adds white circle to Artist -- parent of g
         return g
 
 class AboutDialog(QDialog):
