@@ -3,7 +3,7 @@ sys.path.append('./lib/')
 from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
-                            QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog)
+                            QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog, QGridLayout)
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
@@ -14,66 +14,152 @@ import numpy as np
 import math
 import string
 import qtawesome as qta
+import seaborn as sns
 
 import matplotlib
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-
-        self.compute_initial_figure()
-
+    def __init__(self, type):
+        if type == 'mouse':
+            fig = self.compute_mouse()
+        elif type == 'keyboard':
+            fig = self.compute_keyboard()
+        elif type == 'website':
+            fig = self.compute_website()
+        elif type == 'programs':
+            fig = self.compute_programs()
+        else:
+            fig = self.compute_mouse()
         FigureCanvas.__init__(self, fig)
-        self.setParent(parent)
-
-        FigureCanvas.setSizePolicy(self,
-                                   QSizePolicy.Expanding,
-                                   QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding, QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-    def compute_initial_figure(self):
+    def compute_initial(self):
         pass
 
-class MouseLocPlot(MyMplCanvas):
+    def compute_mouse(self):
+        loc = pd.read_csv('./data/mouseLoc.csv')
+        clicks = pd.read_csv('./data/mouseClicks.csv')
 
-    def compute_initial_figure(self):
-        t = pd.read_csv('./data/mouseLoc.csv')['x']
-        s = pd.read_csv('./data/mouseLoc.csv')['y']
-        self.axes.plot(t, s)
-        # g = sns.jointplot("x", "y", data=df[['x', 'y']], kind = "kde", space=0)
+        # clear figure before graphing
+        plt.clf()
+        # graph onto figure
+        sns.kdeplot(loc.x, loc.y, cmap="Oranges", shade=True)
+        plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+        g = plt.gcf()
+        return g
 
-class MouseClickPlot(MyMplCanvas):
+    def compute_keyboard(self):
+        keys = pd.read_csv('./data/keyboard.csv')
+        # translate keys to image coordinates
+        d= []
+        for k in keys['Key']:
+            if "space" in k:
+                d.append((325,225))
+            elif "a" in k:
+                d.append((110,125))
+            elif "b" in k:
+                d.append((330,175))
+            elif "c" in k:
+                d.append((230, 175))
+            elif "d" in k:
+                d.append((205,125))
+            elif "e" in k:
+                d.append((195,75))
+            elif "f" in k:
+                d.append((255, 125))
+            elif "g" in k:
+                d.append((303,125))
+            elif "h" in k:
+                d.append((353,125))
+            elif "i" in k:
+                d.append((435, 75))
+            elif "j" in k:
+                d.append((400,125))
+            elif "k" in k:
+                d.append((450,125))
+            elif "l" in k:
+                d.append((500,125))
+            elif "m" in k:
+                d.append((425,175))
+            elif "n" in k:
+                d.append((375,175))
+            elif "o" in k:
+                d.append((485,75))
+            elif "p" in k:
+                d.append((530,75))
+            elif "q" in k:
+                d.append((100,75))
+            elif "r" in k:
+                d.append((245,75))
+            elif "s" in k:
+                d.append((160,125))
+            elif "t" in k:
+                d.append((290,75))
+            elif "u" in k:
+                d.append((390,75))
+            elif "v" in k:
+                d.append((280,75))
+            elif "w" in k:
+                d.append((148,75))
+            elif "x" in k:
+                d.append((180,175))
+            elif "y" in k:
+                d.append((340,75))
+            elif "z" in k:
+                d.append((130,175))
+            else:
+                d.append((25,25))
+        df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
+        
+        # clear figure before graphing
+        plt.clf()
+        # graph onto figure
+        sns.kdeplot(df.x, df.y, shade=True, cmap="Oranges", shade_lowest=False, alpha=0.7)
+        keyboard = mpimg.imread('./images/keyboard.png')
+        plt.imshow(keyboard)
+        g = plt.gcf()
+        return g
 
-    def compute_initial_figure(self):
-        t = pd.read_csv('./data/mouseClicks.csv')['x']
-        s = pd.read_csv('./data/mouseClicks.csv')['y']
-        self.axes.plot(t, s, 'ro')
-
-class KeyboardPlot(MyMplCanvas):
-
-    def compute_initial_figure(self):
-        keys = list(pd.read_csv('./data/keyboard.csv')['Key'])
-        unique_keys = list(set(keys))
-
-        freq = []
-        for key in unique_keys:
-            freq.append(keys.count(key))
-
-        ind = np.arange(len(unique_keys))  # the x locations for the groups
-        width = 0.35  # the width of the bars
-
-        self.axes.bar(ind, freq, color='SkyBlue')
-        self.axes.set_ylabel('Frequency')
-        self.axes.set_xlabel('Keys')
-        self.axes.set_xticks(ind)
-        self.axes.set_xticklabels(unique_keys)
+    def compute_website(self):
+        # websites = pd.read_csv('./data/websites.csv')
+        # example data, real data read in from csv
+        websites = 'Facebook', 'Reddit', 'Canvas', 'GitHub',
+        times = [12,11,3,30]
+        
+        # clear figure before graphing
+        plt.clf()
+        # graph onto figure
+        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+        my_circle=plt.Circle( (0,0), 0.7, color='white')
+        plt.pie(times, labels=websites, colors=cmap)
+        g=plt.gcf()
+        g.gca().add_artist(my_circle)
+        return g
+        
+    def compute_programs(self):
+        # apps = pd.read_csv('./data/programs.csv')
+        # example data, real data read in from csv
+        apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
+        times = [12,11,3.4,22]
+        
+        # clear figure before graphing
+        plt.clf()
+        # graph onto figure
+        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+        my_circle=plt.Circle( (0,0), 0.7, color='white')
+        plt.pie(times, labels=apps, colors=cmap)
+        g=plt.gcf()
+        g.gca().add_artist(my_circle)
+        return g
 
 class AboutDialog(QDialog):
 
@@ -232,7 +318,6 @@ class Home(QWidget):
         self.tabs.addTab(self.home_tab, qta.icon('fa.home'),"Home")
         self.tabs.addTab(self.data_select_tab, qta.icon('fa.list'), "Data Select")
         self.tabs.addTab(self.mouse_movement_tab, qta.icon('fa.mouse-pointer'),"Mouse Movements")
-        self.tabs.addTab(self.mouse_click_tab, qta.icon('fa.mouse-pointer'), "Mouse Clicks")
         self.tabs.addTab(self.keyboard_tab, qta.icon('fa.th'),"Keyboard")
         self.tabs.addTab(self.websites_tab, qta.icon('fa.globe'),"Websites")
         self.tabs.addTab(self.programs_tab, qta.icon('fa.desktop'),"Programs")
@@ -241,7 +326,6 @@ class Home(QWidget):
         self.make_home_tab()
         self.make_data_select_tab()
         self.make_mouse_movement_tab()
-        self.make_mouse_click_tab()
         self.make_keyboard_tab()
         self.make_websites_tab()
         self.make_programs_tab()
@@ -371,10 +455,7 @@ class Home(QWidget):
 
         data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
         data_stop_btn.setEnabled(False)
-
-
         data_select_btn = QPushButton(qta.icon('fa.play',color='green'), 'Begin Collecting Data!', self)
-
         data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le, data_stop_btn, data_select_btn))
         data_stop_btn.clicked.connect(lambda: self.stop_data_collection(data_stop_btn, data_select_btn))
         row_6 = QHBoxLayout()
@@ -430,37 +511,6 @@ class Home(QWidget):
 
         self.mouse_movement_tab.setLayout(v_box)
 
-    def make_mouse_click_tab(self):
-        v_box = QVBoxLayout()
-
-        lbl = QLabel(self)
-        lbl.setText('Mouse Clicks')
-        row_1 = QHBoxLayout()
-        row_1.addStretch()
-        row_1.addWidget(lbl)
-        row_1.addStretch()
-
-        row_2 = QHBoxLayout()
-        row_2.addStretch()
-
-        vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
-        download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        vis_btn.clicked.connect(lambda: self.plot_mouse_clicks(row_2))
-        download_btn.clicked.connect(lambda: self.download_data('mouseClicks.csv'))
-        row_3 = QHBoxLayout()
-        row_3.addStretch()
-        row_3.addWidget(vis_btn)
-        row_3.addWidget(download_btn)
-        row_3.addStretch()
-
-        v_box.addLayout(row_1)
-        v_box.addStretch(1)
-        v_box.addLayout(row_2)
-        v_box.addStretch(1)
-        v_box.addLayout(row_3)
-
-        self.mouse_click_tab.setLayout(v_box)
-
     def make_keyboard_tab(self):
         v_box = QVBoxLayout()
 
@@ -507,7 +557,7 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
+        vis_btn.clicked.connect(lambda: self.plot_website(row_2))
         download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
@@ -538,7 +588,7 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        # vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2)) # REPLACE WITH VISUALIZE WEBSITE DATA
+        vis_btn.clicked.connect(lambda: self.plot_apps(row_2))
         download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
@@ -573,27 +623,14 @@ class Home(QWidget):
     def plot_mouse_loc(self, row):
         if row.count() > 2:
             try:
-                row.replaceWidget(row.itemAt(1).widget(), MouseLocPlot(QWidget(self), width=5, height=4, dpi=100))
+                mouse_widget = MyMplCanvas('mouse')
+                row.replaceWidget(row.itemAt(1).widget(), mouse_widget)
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
-                widget = MouseLocPlot(QWidget(self), width=5, height=4, dpi=100)
-                row.addWidget(widget)
-                row.addStretch()
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
-
-    def plot_mouse_clicks(self, row):
-        if row.count() > 2:
-            try:
-                row.replaceWidget(row.itemAt(1).widget(), MouseClickPlot(QWidget(self), width=5, height=4, dpi=100))
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
-        else:
-            try:
-                widget = MouseClickPlot(QWidget(self), width=5, height=4, dpi=100)
-                row.addWidget(widget)
+                mouse_widget = MyMplCanvas('mouse')
+                row.addWidget(mouse_widget)
                 row.addStretch()
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
@@ -601,13 +638,44 @@ class Home(QWidget):
     def plot_keyboard_input(self, row):
         if row.count() > 2:
             try:
-                row.replaceWidget(row.itemAt(1).widget(), KeyboardPlot(QWidget(self), width=5, height=4, dpi=100))
+                kb_widget = MyMplCanvas('keyboard')
+                row.replaceWidget(row.itemAt(1).widget(), kb_widget)
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
-                widget = KeyboardPlot(QWidget(self), width=5, height=4, dpi=100)
-                row.addWidget(widget)
+                kb_widget = MyMplCanvas('keyboard')
+                row.addWidget(kb_widget)
+                row.addStretch()
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+    
+    def plot_website(self, row):
+        if row.count() > 2:
+            try:
+                web_widget = MyMplCanvas('website')
+                row.replaceWidget(row.itemAt(1).widget(), web_widget)
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+        else:
+            try:
+                web_widget = MyMplCanvas('website')
+                row.addWidget(web_widget)
+                row.addStretch()
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+
+    def plot_apps(self, row):
+        if row.count() > 2:
+            try:
+                app_widget = MyMplCanvas('programs')
+                row.replaceWidget(row.itemAt(1).widget(), app_widget)
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+        else:
+            try:
+                app_widget = MyMplCanvas('programs')
+                row.addWidget(app_widget)
                 row.addStretch()
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
