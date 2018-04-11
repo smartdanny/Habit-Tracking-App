@@ -49,20 +49,44 @@ class MyMplCanvas(FigureCanvas):
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        sns.kdeplot(loc.x, loc.y, cmap="Oranges", shade=True)
+        sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
         plt.scatter(clicks.x, clicks.y, c="w", marker="+")
         g = plt.gcf()  # get current figure
         return g
 
     def compute_keyboard(self):
         keys = pd.read_csv('./data/keyboard.csv')
+
         # translate keys to image coordinates
         d= []
         for k in keys['Key']:
-            print(k)
-            if "space" in k:
-                d.append((325,225))
-            elif "a" in k:
+            if "backspace" in k:      # SPECIAL KEYS
+                d.append((670,25))
+            elif "space" in k:
+            	d.append((325,225))
+            elif "tab" in k:
+            	d.append((35,75))
+            elif "caps_lock" in k:
+            	d.append((40,125))
+            elif "menu" in k:
+            	d.append((620,225))
+            elif "ctrl_l" in k:       # default all left/right keys to right
+            	d.append((40,225))
+            elif "ctrl" in k:
+            	d.append((685,225))
+            elif "shift_l" in k:
+            	d.append((55,175))
+            elif "shift" in k:
+            	d.append((655,175))
+            elif "alt_l" in k:
+            	d.append((162,225))
+            elif "alt" in k:
+            	d.append((500,225))
+            elif "cmd_l" in k:
+            	d.append((100,225))
+            elif "cmd" in k:
+            	d.append((560,225))
+            elif "a" in k:            # ALPHABET
                 d.append((110,125))
             elif "b" in k:
                 d.append((330,175))
@@ -114,14 +138,57 @@ class MyMplCanvas(FigureCanvas):
                 d.append((340,75))
             elif "z" in k:
                 d.append((130,175))
-            else:
+            elif "~" in k or "`" in k: # SYMBOLS & NUMBERS
                 d.append((25,25))
+            elif "1" in k or "!" in k:
+                d.append((75,25))
+            elif "2" in k or "@" in k:
+                d.append((125,25))
+            elif "3" in k or "#" in k:
+                d.append((170,25))
+            elif "4" in k or "$" in k:
+                d.append((218,25))
+            elif "5" in k or "%" in k:
+                d.append((265,25))
+            elif "6" in k or "^" in k:
+            	d.append((315, 25))
+            elif "7" in k or "&" in k:
+            	d.append((362,25))
+            elif "8" in k or "*" in k:
+            	d.append((410,25))
+            elif "9" in k or "(" in k:
+            	d.append((460,25))
+            elif "0" in k or ")" in k:
+            	d.append((505,25))
+            elif "-" in k or "_" in k:
+            	d.append((555,25))
+            elif "+" in k or "=" in k:
+            	d.append((600,25))
+            elif "{" in k or "[" in k:
+            	d.append((580,75))
+            elif "{" in k or "]" in k:
+            	d.append((625,75))
+            elif "\\" in k or "|" in k:
+            	d.append((685,75))
+            elif ":" in k or ";" in k:
+            	d.append((545,125))
+            elif "'" in k or '"' in k:
+            	d.append((590,125))
+            elif "<" in k or "," in k:
+            	d.append((470,175))
+            elif ">" in k or "." in k:
+            	d.append((515,175))
+            elif "?" in k or "/" in k:
+            	d.append((565,175))
+            else:
+                pass  # ignore buttons not on standard keyboard
+
         df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
         
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        sns.kdeplot(df.x, df.y, shade=True, cmap="Oranges", shade_lowest=False, alpha=0.7)
+        sns.kdeplot(df.x, df.y, shade=True, shade_lowest=False, cmap="Oranges_r", alpha=0.6)
         keyboard = mpimg.imread('./images/keyboard.png')
         plt.imshow(keyboard)
         g = plt.gcf() # get current figure
@@ -647,7 +714,8 @@ class Home(QWidget):
                 row.addStretch()
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
-    
+                print(ErrorMessage)
+
     def plot_website(self, row):
         if row.count() > 2:
             try:
