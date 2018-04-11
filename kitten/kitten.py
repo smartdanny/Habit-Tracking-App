@@ -1,5 +1,8 @@
 import sys
 sys.path.append('./lib/')
+import matplotlib
+# Make sure that we are using QT5
+matplotlib.use('Qt5Agg')
 from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
@@ -16,9 +19,7 @@ import string
 import qtawesome as qta
 import seaborn as sns
 
-import matplotlib
-# Make sure that we are using QT5
-matplotlib.use('Qt5Agg')
+
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -28,6 +29,7 @@ class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
     def __init__(self, type):
+        self.screenSize = getScreenSize()
         if type == 'mouse':
             fig = self.compute_mouse()
         elif type == 'keyboard':
@@ -51,6 +53,16 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
         plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+
+        # Set X and Y limits
+        plt.ylim(0, self.screenSize.height()) #limits minimum and maximum values on graph to fit screen size
+        plt.xlim(0, self.screenSize.width()) #limits minimum and maximum values on graph to fit screen size
+
+        #Flip y axis and change label location
+        ax = plt.gca()
+        ax.set_ylim(ax.get_ylim()[::-1])
+        ax.xaxis.tick_top()
+        ax.xaxis.set_label_position('top')
         g = plt.gcf()  # get current figure
         return g
 
@@ -184,7 +196,7 @@ class MyMplCanvas(FigureCanvas):
                 pass  # ignore buttons not on standard keyboard
 
         df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -199,7 +211,7 @@ class MyMplCanvas(FigureCanvas):
         # example data, real data read in from csv
         websites = 'Facebook', 'Reddit', 'Canvas', 'GitHub',
         times = [12,11,3,30]
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -209,13 +221,13 @@ class MyMplCanvas(FigureCanvas):
         g = plt.gcf() # get current figure
         g.gca().add_artist(my_circle)
         return g
-        
+
     def compute_programs(self):
         # apps = pd.read_csv('./data/programs.csv')
         # example data, real data read in from csv
         apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
         times = [12,11,3.4,22]
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -870,7 +882,7 @@ def getScreenSize():
     ''' Returns screen size '''
     screen = app.primaryScreen()
     screenSize = screen.size()
-    print('Detecting resolution...\nwidth: %d \nheight: %d' % (screenSize.width(), screenSize.height()))
+    # print('Detecting resolution...\nwidth: %d \nheight: %d' % (screenSize.width(), screenSize.height()))
     return screen.size()
 
 if __name__ == '__main__':
