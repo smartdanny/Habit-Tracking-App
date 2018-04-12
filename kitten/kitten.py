@@ -340,34 +340,44 @@ class Home(QWidget):
         data_layout.setColumnStretch(0, 4)
         data_layout.setColumnStretch(2, 7)
 
-
-        mouse_movements_check_box = QCheckBox('Mouse Movements', self)
+        mouse_lbl = QLabel('Mouse')
+        mouse_movements_check_box = QCheckBox('Movement', self)
         mouse_movements_check_box.stateChanged.connect(self.switch_mouse_movement_state)
-        data_layout.addWidget(mouse_movements_check_box, 0, 1)
-        data_layout.addWidget(QLabel(' '), 1, 1)
-
-        mouse_clicks_check_box = QCheckBox('Mouse Clicks', self)
+        mouse_clicks_check_box = QCheckBox('Clicks', self)
         mouse_clicks_check_box.stateChanged.connect(self.switch_mouse_click_state)
-        data_layout.addWidget(mouse_clicks_check_box, 2, 1)
-        data_layout.addWidget(QLabel(' '), 3, 1)
+        data_layout.addWidget(mouse_lbl, 1, 1)
+        data_layout.addWidget(mouse_movements_check_box, 2, 1)
+        data_layout.addWidget(mouse_clicks_check_box, 2, 2)
+        data_layout.addWidget(QLabel(''), 3, 1)
 
-        keyboard_check_box = QCheckBox('Keyboard', self)
+        keyboard_lbl = QLabel('Keyboard')
+        keyboard_check_box = QCheckBox('Keyboard Input', self)
         keyboard_check_box.stateChanged.connect(self.switch_keyboard_input_state)
-        data_layout.addWidget(keyboard_check_box, 4, 1)
-        data_layout.addWidget(QLabel(' '), 5, 1)
+        data_layout.addWidget(keyboard_lbl, 4, 1)
+        data_layout.addWidget(keyboard_check_box, 5, 1)
+        data_layout.addWidget(QLabel(' '), 6, 1)
 
+        programs_lbl = QLabel('Programs')
         programs_check_box = QCheckBox('Programs', self)
-        programs_le = QLineEdit()
-        programs_le.setPlaceholderText('Ex: \'slack,photoshop \' ')
+        self.programs_le = QLineEdit()
+        self.programs_le.setPlaceholderText('Ex: \'slack,photoshop \' ')
+        self.programs_le.setEnabled(False)
         programs_check_box.stateChanged.connect(self.switch_running_program_state)
-        data_layout.addWidget(programs_check_box, 6, 1)
-        data_layout.addWidget(QLabel(' '), 7, 1)
+        data_layout.addWidget(programs_lbl, 7, 1)
+        data_layout.addWidget(programs_check_box, 8, 1)
+        data_layout.addWidget(self.programs_le, 8, 2)
+        data_layout.addWidget(QLabel(' '), 9, 1)
 
+        websites_lbl = QLabel('Websites')
         websites_check_box = QCheckBox('Websites', self)
         self.websites_le = QLineEdit()
         self.websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
+        self.websites_le.setEnabled(False)
         websites_check_box.stateChanged.connect(self.switch_running_website_state)
-        data_layout.addWidget(websites_check_box, 8, 1)
+        data_layout.addWidget(websites_lbl, 10, 1)
+        data_layout.addWidget(websites_check_box, 11, 1)
+        data_layout.addWidget(self.websites_le, 11, 2)
+        data_layout.addWidget(QLabel(' '), 12, 1)
 
         data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
         data_stop_btn.setEnabled(False)
@@ -715,9 +725,17 @@ class Home(QWidget):
         self.keyboard_input_selection = not self.keyboard_input_selection
 
     def switch_running_program_state(self):
+        if self.programs_le.isEnabled():
+            self.programs_le.setEnabled(False)
+        else:
+            self.programs_le.setEnabled(True)
         self.running_program_selection = not self.running_program_selection
 
     def switch_running_website_state(self):
+        if self.websites_le.isEnabled():
+            self.websites_le.setEnabled(False)
+        else:
+            self.websites_le.setEnabled(True)
         self.running_website_selection = not self.running_website_selection
 
     def download_data(self, data_name):
