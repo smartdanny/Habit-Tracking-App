@@ -184,7 +184,7 @@ class MyMplCanvas(FigureCanvas):
                 pass  # ignore buttons not on standard keyboard
 
         df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -199,7 +199,7 @@ class MyMplCanvas(FigureCanvas):
         # example data, real data read in from csv
         websites = 'Facebook', 'Reddit', 'Canvas', 'GitHub',
         times = [12,11,3,30]
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -209,13 +209,13 @@ class MyMplCanvas(FigureCanvas):
         g = plt.gcf() # get current figure
         g.gca().add_artist(my_circle)
         return g
-        
+
     def compute_programs(self):
         # apps = pd.read_csv('./data/programs.csv')
         # example data, real data read in from csv
         apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
         times = [12,11,3.4,22]
-        
+
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -714,7 +714,6 @@ class Home(QWidget):
                 row.addStretch()
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
-                print(ErrorMessage)
 
     def plot_website(self, row):
         if row.count() > 2:
