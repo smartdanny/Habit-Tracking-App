@@ -18,6 +18,7 @@ import math
 import string
 import qtawesome as qta
 import seaborn as sns
+from qrangeslider import qrangeslider
 
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -44,7 +45,7 @@ class MyMplCanvas(FigureCanvas):
         FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding, QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-    def compute_mouse(self):
+    def compute_mouse(self, min_time = 0, max_time = 0):
         loc = pd.read_csv('./data/mouseLoc.csv')
         clicks = pd.read_csv('./data/mouseClicks.csv')
 
@@ -66,7 +67,7 @@ class MyMplCanvas(FigureCanvas):
         g = plt.gcf()  # get current figure
         return g
 
-    def compute_keyboard(self):
+    def compute_keyboard(self, min_time = 0, max_time = 0):
         keys = pd.read_csv('./data/keyboard.csv')
 
         # translate keys to image coordinates
@@ -206,7 +207,7 @@ class MyMplCanvas(FigureCanvas):
         g = plt.gcf() # get current figure
         return g
 
-    def compute_website(self):
+    def compute_website(self, min_time = 0, max_time = 0):
         # websites = pd.read_csv('./data/websites.csv')
         # example data, real data read in from csv
         websites = 'Facebook', 'Reddit', 'Canvas', 'GitHub',
@@ -222,7 +223,7 @@ class MyMplCanvas(FigureCanvas):
         g.gca().add_artist(my_circle)
         return g
 
-    def compute_programs(self):
+    def compute_programs(self, min_time = 0, max_time = 0):
         # apps = pd.read_csv('./data/programs.csv')
         # example data, real data read in from csv
         apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
@@ -572,12 +573,14 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
+        range_slider = qrangeslider.QRangeSlider()
+        vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
         row_3.addWidget(download_btn)
+        row_3.addWidget(range_slider)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -603,12 +606,14 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2))
+        range_slider = qrangeslider.QRangeSlider()
+        vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('keyboard.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
         row_3.addWidget(download_btn)
+        row_3.addWidget(range_slider)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -634,12 +639,14 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        vis_btn.clicked.connect(lambda: self.plot_website(row_2))
+        range_slider = qrangeslider.QRangeSlider()
+        vis_btn.clicked.connect(lambda: self.plot_website(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
         row_3.addWidget(download_btn)
+        row_3.addWidget(range_slider)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -665,12 +672,14 @@ class Home(QWidget):
 
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
-        vis_btn.clicked.connect(lambda: self.plot_apps(row_2))
+        range_slider = qrangeslider.QRangeSlider()
+        vis_btn.clicked.connect(lambda: self.plot_apps(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
         row_3.addWidget(download_btn)
+        row_3.addWidget(range_slider)
         row_3.addStretch()
 
         v_box.addLayout(row_1)
@@ -697,7 +706,7 @@ class Home(QWidget):
 
         self.help_tab.setLayout(v_box)
 
-    def plot_mouse_loc(self, row):
+    def plot_mouse_loc(self, row, min_time, max_time):
         if row.count() > 2:
             try:
                 mouse_widget = MyMplCanvas('mouse')
@@ -712,7 +721,7 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
-    def plot_keyboard_input(self, row):
+    def plot_keyboard_input(self, row, min_time, max_time):
         if row.count() > 2:
             try:
                 kb_widget = MyMplCanvas('keyboard')
@@ -728,7 +737,7 @@ class Home(QWidget):
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
                 print(ErrorMessage)
 
-    def plot_website(self, row):
+    def plot_website(self, row, min_time, max_time):
         if row.count() > 2:
             try:
                 web_widget = MyMplCanvas('website')
@@ -743,7 +752,7 @@ class Home(QWidget):
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
-    def plot_apps(self, row):
+    def plot_apps(self, row, min_time, max_time):
         if row.count() > 2:
             try:
                 app_widget = MyMplCanvas('programs')
