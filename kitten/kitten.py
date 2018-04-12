@@ -304,6 +304,52 @@ class AboutDialog(QDialog):
         }
         ''')
 
+class CustomizeDialog(QDialog):
+
+    def __init__(self):
+        super().__init__()
+
+        # Set title, icon, and size
+        self.setWindowIcon(QIcon('./images/logo-256x256'))
+        self.setWindowTitle("Customize")
+        self.setWindowModality(Qt.ApplicationModal)
+        self.resize(625, 250)
+
+        # Create About text
+        theme_lbl = QLabel('Themes')
+        theme_lbl.setAlignment(Qt.AlignCenter)
+
+        # Create first row
+        customize_row_1 = QHBoxLayout()
+        customize_row_1.addStretch()
+        customize_row_1.addWidget(theme_lbl)
+        customize_row_1.addStretch()
+
+        # Create OK button
+        ok_btn = QPushButton("OK")
+        ok_btn.clicked.connect(self.close)
+
+        # Create second row
+        customize_row_2 = QHBoxLayout()
+        customize_row_2.addStretch()
+        customize_row_2.addWidget(ok_btn)
+        customize_row_2.addStretch()
+
+        # Vertical layout
+        customize_v_box = QVBoxLayout()
+        customize_v_box.addLayout(customize_row_1)
+        customize_v_box.addStretch(1)
+        customize_v_box.addLayout(customize_row_2)
+        customize_v_box.addStretch(1)
+        self.setLayout(customize_v_box)
+
+        self.setStyleSheet('''
+        QLabel, QPushButton {
+            font: 11pt Myriad Pro;
+            color: black;
+        }
+        ''')
+
 class App(QMainWindow):
 
     def __init__(self):
@@ -460,7 +506,8 @@ class Home(QWidget):
 
         # Customize Home button
         customize_btn = QPushButton(qta.icon('fa.cog'), 'Customize', self)
-        customize_btn.clicked.connect(lambda: about_dialog.exec_())
+        customize_dialog = CustomizeDialog()
+        customize_btn.clicked.connect(lambda: customize_dialog.exec_())
 
         # Row 3 buttons
         row_3 = QHBoxLayout()
