@@ -51,18 +51,27 @@ class MyMplCanvas(FigureCanvas):
 
 
     def compute_mouse(self, min_time = 0, max_time = 0):
+    	# NEED TO convert input min_time and max_time to values to compare with csv
 
         # clear figure before graphing
         plt.clf()
 
         try:
             loc = pd.read_csv('./data/mouseLoc.csv')
+            if min_time != 0 and max_time != 0:
+                loc_clip = loc.iloc[1:] # ignore first entry
+                loc = loc_clip.loc[lambda loc: loc.Time >= min_time, :]
+                loc = loc.loc[lambda loc: loc.Time <= max_time, :]
             sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
         except:
             pass
 
         try:
             clicks = pd.read_csv('./data/mouseClicks.csv')
+            if min_time != 0 and max_time != 0:
+            	clicks_clip = clicks.iloc[1:]  # have to ignore first entry due to epoch time
+            	clicks = clicks.loc[lambda clicks: clicks.Time >= min_time, :]
+            	clicks = clicks.loc[lambda clicks: clicks.Time <= max_time, :]
             plt.scatter(clicks.x, clicks.y, c="w", marker="+")
         except:
             pass
@@ -71,17 +80,23 @@ class MyMplCanvas(FigureCanvas):
         plt.ylim(0, self.screenSize.height()) #limits minimum and maximum values on graph to fit screen size
         plt.xlim(0, self.screenSize.width()) #limits minimum and maximum values on graph to fit screen size
 
-        #Flip y axis and change label location
+        # Flip y axis and change label location
         ax = plt.gca()
         ax.set_ylim(ax.get_ylim()[::-1])
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position('top')
-        g = plt.gcf()  # get current figure
+
+        # get current pyplot figure
+        g = plt.gcf()
         return g
 
     def compute_keyboard(self, min_time = 0, max_time = 0):
+    	# NEED TO convert min_time and max_time to values to compare with csv
         keys = pd.read_csv('./data/keyboard.csv')
-
+        if min_time != 0 and max_time != 0:
+        	keys_clip = keys.iloc[1:]  # have to ignore first entry due to epoch time
+        	keys = keys.loc[lambda keys: keys.Time >= min_time, :]
+        	keys = keys.loc[lambda keys: keys.Time <= max_time, :]
         # translate keys to image coordinates
         d= []
         for k in keys['Key']:
