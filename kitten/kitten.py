@@ -426,7 +426,7 @@ class Home(QWidget):
 
     def make_home_tab(self):
 
-        # Add above border
+        # Add top border
         border_top = QLabel(self)
         border_top.setPixmap(QPixmap('./images/border-top.png'))
         row_0 = QHBoxLayout()
@@ -476,7 +476,7 @@ class Home(QWidget):
         row_4 = QHBoxLayout()
         row_4.addWidget(version_number)
 
-        # Add above border
+        # Add bottom border
         border_bottom = QLabel(self)
         border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
         row_5 = QHBoxLayout()
@@ -496,18 +496,18 @@ class Home(QWidget):
 
     def make_data_select_tab(self):
 
-        data_select_title = QLabel('Data Select', self)
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
+        data_select_title = QLabel('Data Select')
         data_select_title.setObjectName('tab_title')
-        data_select_title.setAlignment(Qt.AlignLeft)
         row_0 = QHBoxLayout()
+        row_0.addStretch()
         row_0.addWidget(data_select_title)
         row_0.addStretch()
-
-        tab_title_border = QLabel(self)
-        tab_title_border.setPixmap(QPixmap('./images/tab-title-border.png'))
-        border_row = QHBoxLayout()
-        border_row.addWidget(tab_title_border)
-        border_row.addStretch()
 
         data_layout = QGridLayout()
         data_layout.setColumnStretch(0, 4)
@@ -563,14 +563,21 @@ class Home(QWidget):
         row_6.addWidget(data_stop_btn)
         row_6.addStretch()
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
         v_box = QVBoxLayout()
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_0)
-        v_box.addLayout(border_row)
         v_box.addStretch(1)
         v_box.addLayout(data_layout)
         v_box.addStretch(1)
         v_box.addLayout(row_6)
         v_box.addStretch(1) # This takes up space at the bottom.
+        v_box.addLayout(border_bottom_row)
 
         self.data_select_tab.setLayout(v_box)
 
@@ -604,11 +611,17 @@ class Home(QWidget):
 
         v_box = QVBoxLayout()
 
-        lbl = QLabel(self)
-        lbl.setText('Mouse Movements')
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
+        mouse_lbl = QLabel('Mouse', self)
+        mouse_lbl.setObjectName('tab_title')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(lbl)
+        row_1.addWidget(mouse_lbl)
         row_1.addStretch()
 
         row_2 = QHBoxLayout()
@@ -619,6 +632,11 @@ class Home(QWidget):
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
 
         # row_3 = self.timeInputDialog() #display the box for the start time
         # row_4 = self.timeInputDialog() #display the box for the start time
@@ -630,7 +648,7 @@ class Home(QWidget):
         row_5.addWidget(range_slider)
         row_5.addStretch()
 
-
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
@@ -640,17 +658,25 @@ class Home(QWidget):
         # v_box.addLayout(row_4)
         # v_box.addStretch(1)
         v_box.addLayout(row_5)
+        v_box.addLayout(border_bottom_row)
 
         self.mouse_movement_tab.setLayout(v_box)
 
     def make_keyboard_tab(self):
+
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
         v_box = QVBoxLayout()
 
-        lbl = QLabel(self)
-        lbl.setText('Keyboard')
+        keyboard_lbl = QLabel('Keyboard', self)
+        keyboard_lbl.setObjectName('tab_title')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(lbl)
+        row_1.addWidget(keyboard_lbl)
         row_1.addStretch()
 
         row_2 = QHBoxLayout()
@@ -668,22 +694,36 @@ class Home(QWidget):
         row_3.addWidget(range_slider)
         row_3.addStretch()
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
         v_box.addLayout(row_3)
+        v_box.addLayout(border_bottom_row)
 
         self.keyboard_tab.setLayout(v_box)
 
     def make_websites_tab(self):
         v_box = QVBoxLayout()
 
-        lbl = QLabel(self)
-        lbl.setText('Websites')
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
+        websites_lbl = QLabel('Websites', self)
+        websites_lbl.setObjectName('tab_title')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(lbl)
+        row_1.addWidget(websites_lbl)
         row_1.addStretch()
 
         row_2 = QHBoxLayout()
@@ -701,22 +741,36 @@ class Home(QWidget):
         row_3.addWidget(range_slider)
         row_3.addStretch()
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
         v_box.addLayout(row_3)
+        v_box.addLayout(border_bottom_row)
 
         self.websites_tab.setLayout(v_box)
 
     def make_programs_tab(self):
         v_box = QVBoxLayout()
 
-        lbl = QLabel(self)
-        lbl.setText('Programs')
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
+        programs_lbl = QLabel('Programs', self)
+        programs_lbl.setObjectName('tab_title')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(lbl)
+        row_1.addWidget(programs_lbl)
         row_1.addStretch()
 
         row_2 = QHBoxLayout()
@@ -734,11 +788,19 @@ class Home(QWidget):
         row_3.addWidget(range_slider)
         row_3.addStretch()
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
         v_box.addLayout(row_3)
+        v_box.addLayout(border_bottom_row)
 
         self.programs_tab.setLayout(v_box)
 
