@@ -407,7 +407,7 @@ class Home(QWidget):
         # Add tabs
         self.tabs.addTab(self.home_tab, qta.icon('fa.home'),"Home")
         self.tabs.addTab(self.data_select_tab, qta.icon('fa.list'), "Data Select")
-        self.tabs.addTab(self.mouse_movement_tab, qta.icon('fa.mouse-pointer'),"Mouse Movements")
+        self.tabs.addTab(self.mouse_movement_tab, qta.icon('fa.mouse-pointer'),"Mouse")
         self.tabs.addTab(self.keyboard_tab, qta.icon('fa.th'),"Keyboard")
         self.tabs.addTab(self.websites_tab, qta.icon('fa.globe'),"Websites")
         self.tabs.addTab(self.programs_tab, qta.icon('fa.desktop'),"Programs")
