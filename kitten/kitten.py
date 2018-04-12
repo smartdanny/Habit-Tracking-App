@@ -619,7 +619,7 @@ class Home(QWidget):
         row_5.addStretch()
         row_5.addWidget(vis_btn)
         row_5.addWidget(download_btn)
-        row_3.addWidget(range_slider)
+        row_5.addWidget(range_slider)
         row_5.addStretch()
 
 
@@ -751,6 +751,7 @@ class Home(QWidget):
         self.help_tab.setLayout(v_box)
 
     def plot_mouse_loc(self, row, min_time, max_time):
+        print(max_time)
         if row.count() > 2:
             missingBoth = 0
             try:
