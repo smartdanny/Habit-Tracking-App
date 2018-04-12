@@ -30,6 +30,9 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+# Globals
+THEME = "Oranges_r" # default graph theme
+
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
@@ -62,7 +65,7 @@ class MyMplCanvas(FigureCanvas):
                 loc_clip = loc.iloc[1:] # ignore first entry
                 loc = loc_clip.loc[lambda loc: loc.Time >= min_time, :]
                 loc = loc.loc[lambda loc: loc.Time <= max_time, :]
-            sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
+            sns.kdeplot(loc.x, loc.y, shade=True, cmap=THEME)
         except:
             pass
 
@@ -228,7 +231,7 @@ class MyMplCanvas(FigureCanvas):
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        sns.kdeplot(df.x, df.y, shade=True, shade_lowest=False, cmap="Oranges_r", alpha=0.6)
+        sns.kdeplot(df.x, df.y, shade=True, shade_lowest=False, cmap=THEME, alpha=0.6)
         keyboard = mpimg.imread('./images/keyboard.png')
         plt.imshow(keyboard)
         g = plt.gcf() # get current figure
@@ -243,7 +246,10 @@ class MyMplCanvas(FigureCanvas):
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        cmap = matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+        if (THEME == "plasma"):
+            cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        else:
+            cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle = plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=websites, colors=cmap)
         g = plt.gcf() # get current figure
@@ -259,7 +265,10 @@ class MyMplCanvas(FigureCanvas):
         # clear figure before graphing
         plt.clf()
         # graph onto figure
-        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+        if (THEME == "plasma"):
+            cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        else:
+   	        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle=plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=apps, colors=cmap)
         g = plt.gcf() # get current figure
