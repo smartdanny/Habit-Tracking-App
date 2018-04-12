@@ -20,6 +20,7 @@ def read_from_CSV(csvFileName):
         reader = csv.reader(f)
         columnNames = next(reader) # get the column names
         values = [list(map(float, row)) for row in csv.reader(f)] # read in floats to array
+        
     # Recalculate the time since epoch into timestamps
     date.append(datetime.datetime.fromtimestamp(values[0][0]))
     for i in range(1, len(values)):
