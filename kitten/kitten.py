@@ -726,7 +726,6 @@ class Home(QWidget):
                 row.addStretch()
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
-                print(ErrorMessage)
 
     def plot_website(self, row):
         if row.count() > 2:
