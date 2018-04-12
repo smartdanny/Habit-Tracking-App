@@ -555,7 +555,7 @@ class Home(QWidget):
         data_stop_btn = QPushButton(qta.icon('fa.stop', color='red'), 'Stop Collecting Data!', self)
         data_stop_btn.setEnabled(False)
         data_select_btn = QPushButton(qta.icon('fa.play',color='green'), 'Begin Collecting Data!', self)
-        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(websites_le, programs_le, data_stop_btn, data_select_btn))
+        data_select_btn.clicked.connect(lambda: self.initiate_data_collection(self.websites_le, self.programs_le, data_stop_btn, data_select_btn))
         data_stop_btn.clicked.connect(lambda: self.stop_data_collection(data_stop_btn, data_select_btn))
         row_6 = QHBoxLayout()
         row_6.addStretch()
