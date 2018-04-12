@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./lib/')
 import matplotlib
+import lib.mouseTrack.csvToDataFrameExample as csvHelper
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 from os.path import expanduser
@@ -45,14 +46,20 @@ class MyMplCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
     def compute_mouse(self):
-        loc = pd.read_csv('./data/mouseLoc.csv')
-        clicks = pd.read_csv('./data/mouseClicks.csv')
-
         # clear figure before graphing
         plt.clf()
-        # graph onto figure
-        sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
-        plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+
+        try:
+            loc = pd.read_csv('./data/mouseLoc.csv')
+            sns.kdeplot(loc.x, loc.y, shade=True, cmap="Oranges_r")
+        except:
+            pass
+
+        try:
+            clicks = pd.read_csv('./data/mouseClicks.csv')
+            plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+        except:
+            pass
 
         # Set X and Y limits
         plt.ylim(0, self.screenSize.height()) #limits minimum and maximum values on graph to fit screen size
@@ -556,6 +563,32 @@ class Home(QWidget):
 
         self.data_select_tab.setLayout(v_box)
 
+    def timeInputDialog(self):
+        month_le = QLineEdit()
+        month_le.setPlaceholderText('Month')
+        day_le = QLineEdit()
+        day_le.setPlaceholderText('Day')
+        year_le = QLineEdit()
+        year_le.setPlaceholderText('Year')
+        hour_le = QLineEdit()
+        hour_le.setPlaceholderText('Hour')
+        min_le = QLineEdit()
+        min_le.setPlaceholderText('Minute')
+        sec_le = QLineEdit()
+        sec_le.setPlaceholderText('Second')
+        AMorPM_le = QLineEdit()
+        AMorPM_le.setPlaceholderText('AM/PM')
+        row = QHBoxLayout()
+        row.addStretch()
+        row.addWidget(month_le)
+        row.addWidget(day_le)
+        row.addWidget(year_le)
+        row.addWidget(hour_le)
+        row.addWidget(min_le)
+        row.addWidget(sec_le)
+        row.addWidget(AMorPM_le)
+        return row
+
     def make_mouse_movement_tab(self):
 
         v_box = QVBoxLayout()
@@ -569,22 +602,29 @@ class Home(QWidget):
 
         row_2 = QHBoxLayout()
         row_2.addStretch()
-
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
-        row_3 = QHBoxLayout()
-        row_3.addStretch()
-        row_3.addWidget(vis_btn)
-        row_3.addWidget(download_btn)
-        row_3.addStretch()
+
+        # row_3 = self.timeInputDialog() #display the box for the start time
+        # row_4 = self.timeInputDialog() #display the box for the start time
+
+        row_5 = QHBoxLayout()
+        row_5.addStretch()
+        row_5.addWidget(vis_btn)
+        row_5.addWidget(download_btn)
+        row_5.addStretch()
 
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
-        v_box.addLayout(row_3)
+        # v_box.addLayout(row_3)
+        # v_box.addStretch(1)
+        # v_box.addLayout(row_4)
+        # v_box.addStretch(1)
+        v_box.addLayout(row_5)
 
         self.mouse_movement_tab.setLayout(v_box)
 
@@ -699,18 +739,38 @@ class Home(QWidget):
 
     def plot_mouse_loc(self, row):
         if row.count() > 2:
+            missingBoth = 0
             try:
+                loc = pd.read_csv('./data/mouseLoc.csv')
+            except:
+                missingBoth+=1
+            try:
+                plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+            except:
+                missingBoth+=1
+
+            if missingBoth == 2:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            else:
                 mouse_widget = MyMplCanvas('mouse')
                 row.replaceWidget(row.itemAt(1).widget(), mouse_widget)
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
+            missingBoth = 0
             try:
+                loc = pd.read_csv('./data/mouseLoc.csv')
+            except:
+                missingBoth+=1
+            try:
+                plt.scatter(clicks.x, clicks.y, c="w", marker="+")
+            except:
+                missingBoth+=1
+
+            if missingBoth == 2:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            else:
                 mouse_widget = MyMplCanvas('mouse')
                 row.addWidget(mouse_widget)
                 row.addStretch()
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_keyboard_input(self, row):
         if row.count() > 2:
