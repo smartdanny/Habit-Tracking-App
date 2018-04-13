@@ -30,7 +30,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-THEME=''
+THEME='Oranges_r'
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -481,17 +481,17 @@ class CustomizeDialog(QDialog):
         elif self.inferno_theme_btn.isChecked():
             THEME='inferno'
         elif self.oranges_theme_btn.isChecked():
-            THEME='oranges'
+            THEME='Oranges_r'
         elif self.reds_theme_btn.isChecked():
-            THEME='reds'
+            THEME='Reds_r'
         elif self.purples_theme_btn.isChecked():
-            THEME='purples'
+            THEME='Purples_r'
         elif self.blues_theme_btn.isChecked():
-            THEME='blues'
+            THEME='Blues_r'
         elif self.greens_theme_btn.isChecked():
-            THEME='greens'
+            THEME='Greens_r'
         elif self.greys_theme_btn.isChecked():
-            THEME='greys'
+            THEME='Greys_r'
 
 class App(QMainWindow):
 
