@@ -8,8 +8,8 @@ from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
                             QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog, QTableWidget,
-                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup)
-from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient
+                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup, QShortcut)
+from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient, QKeySequence
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
@@ -608,7 +608,7 @@ class Home(QWidget):
         self.tabs = QTabWidget()
         self.home_tab = QWidget()
         self.data_select_tab = QWidget()
-        self.mouse_movement_tab = QWidget()
+        self.mouse_tab = QWidget()
         self.mouse_click_tab = QWidget()
         self.keyboard_tab = QWidget()
         self.websites_tab = QWidget()
@@ -618,7 +618,7 @@ class Home(QWidget):
         # Add tabs
         self.tabs.addTab(self.home_tab, qta.icon('fa.home'),"Home")
         self.tabs.addTab(self.data_select_tab, qta.icon('fa.list'), "Data Select")
-        self.tabs.addTab(self.mouse_movement_tab, qta.icon('fa.mouse-pointer'),"Mouse")
+        self.tabs.addTab(self.mouse_tab, qta.icon('fa.mouse-pointer'),"Mouse")
         self.tabs.addTab(self.keyboard_tab, qta.icon('fa.th'),"Keyboard")
         self.tabs.addTab(self.websites_tab, qta.icon('fa.globe'),"Websites")
         self.tabs.addTab(self.programs_tab, qta.icon('fa.desktop'),"Programs")
@@ -626,14 +626,45 @@ class Home(QWidget):
 
         self.make_home_tab()
         self.make_data_select_tab()
-        self.make_mouse_movement_tab()
+        self.make_mouse_tab()
         self.make_keyboard_tab()
         self.make_websites_tab()
         self.make_programs_tab()
         self.make_help_tab()
 
+        # Keyboard shortcuts
+        self.home_shortcut = QShortcut(QKeySequence("Ctrl+1"), self)
+        self.home_shortcut.activated.connect(self.open_home)
+        self.data_select_shortcut = QShortcut(QKeySequence("Ctrl+2"), self)
+        self.data_select_shortcut.activated.connect(self.open_data_select)
+        self.mouse_shortcut = QShortcut(QKeySequence("Ctrl+3"), self)
+        self.mouse_shortcut.activated.connect(self.open_mouse)
+        self.keyboard_shortcut = QShortcut(QKeySequence("Ctrl+4"), self)
+        self.keyboard_shortcut.activated.connect(self.open_keyboard)
+        self.websites_shortcut = QShortcut(QKeySequence("Ctrl+5"), self)
+        self.websites_shortcut.activated.connect(self.open_websites)
+        self.programs_shortcut = QShortcut(QKeySequence("Ctrl+6"), self)
+        self.programs_shortcut.activated.connect(self.open_programs)
+        self.help_shortcut = QShortcut(QKeySequence("Ctrl+7"), self)
+        self.help_shortcut.activated.connect(self.open_help)
+
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+
+    def open_home(self):
+        self.tabs.setCurrentWidget(self.home_tab)
+    def open_data_select(self):
+        self.tabs.setCurrentWidget(self.data_select_tab)
+    def open_mouse(self):
+        self.tabs.setCurrentWidget(self.mouse_tab)
+    def open_keyboard(self):
+        self.tabs.setCurrentWidget(self.keyboard_tab)
+    def open_websites(self):
+        self.tabs.setCurrentWidget(self.websites_tab)
+    def open_programs(self):
+        self.tabs.setCurrentWidget(self.programs_tab)
+    def open_help(self):
+        self.tabs.setCurrentWidget(self.help_tab)
 
     def make_home_tab(self):
 
@@ -819,7 +850,7 @@ class Home(QWidget):
         row.addWidget(AMorPM_le)
         return row
 
-    def make_mouse_movement_tab(self):
+    def make_mouse_tab(self):
 
         v_box = QVBoxLayout()
 
@@ -872,7 +903,7 @@ class Home(QWidget):
         v_box.addLayout(row_5)
         v_box.addLayout(border_bottom_row)
 
-        self.mouse_movement_tab.setLayout(v_box)
+        self.mouse_tab.setLayout(v_box)
 
     def make_keyboard_tab(self):
 
