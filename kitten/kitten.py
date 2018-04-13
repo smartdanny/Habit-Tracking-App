@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 # Globals
-THEME = "Oranges_r" # default graph theme
+THEME = "Oranges_r" # default theme
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -248,6 +248,22 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         if (THEME == "plasma"):
             cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        elif (THEME=="viridis"):
+        	cmap=matplotlib.cm.viridis(np.arange(0,1,.15))
+        elif (THEME=="magma"):
+        	cmap=matplotlib.cm.magma(np.arange(0,1,.15))
+        elif (THEME=="inferno"):
+        	cmap=matplotlib.cm.inferno(np.arange(0,1,.15))
+        elif (THEME=="Reds_r"):
+        	cmap=matplotlib.cm.Reds(np.arange(0.2,1,.1))
+        elif (THEME=="Purples_r"):
+        	cmap=matplotlib.cm.Purples(np.arange(0.2,1,.1))
+        elif (THEME=="Blues_r"):
+        	cmap=matplotlib.cm.Blues(np.arange(0.2,1,.1))
+        elif (THEME=="Greens_r"):
+        	cmap=matplotlib.cm.Greens(np.arange(0.2,1,.1))
+        elif (THEME=="Greys_r"):
+        	cmap=matplotlib.cm.Greys(np.arange(0.2,1,.1))
         else:
             cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle = plt.Circle( (0,0), 0.7, color='white')
@@ -267,8 +283,24 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         if (THEME == "plasma"):
             cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        elif (THEME=="viridis"):
+        	cmap=matplotlib.cm.viridis(np.arange(0,1,.15))
+        elif (THEME=="magma"):
+        	cmap=matplotlib.cm.magma(np.arange(0,1,.15))
+        elif (THEME=="inferno"):
+        	cmap=matplotlib.cm.inferno(np.arange(0,1,.15))
+        elif (THEME=="Reds_r"):
+        	cmap=matplotlib.cm.Reds(np.arange(0.2,1,.1))
+        elif (THEME=="Purples_r"):
+        	cmap=matplotlib.cm.Purples(np.arange(0.2,1,.1))
+        elif (THEME=="Blues_r"):
+        	cmap=matplotlib.cm.Blues(np.arange(0.2,1,.1))
+        elif (THEME=="Greens_r"):
+        	cmap=matplotlib.cm.Greens(np.arange(0.2,1,.1))
+        elif (THEME=="Greys_r"):
+        	cmap=matplotlib.cm.Greys(np.arange(0.2,1,.1))
         else:
-   	        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+            cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle=plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=apps, colors=cmap)
         g = plt.gcf() # get current figure
