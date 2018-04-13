@@ -8,7 +8,7 @@ from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
                             QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog, QTableWidget,
-                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem)
+                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup)
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
@@ -29,6 +29,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+
+THEME=''
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -308,6 +310,7 @@ class CustomizeDialog(QDialog):
 
     def __init__(self):
         super().__init__()
+        self.layout = QVBoxLayout(self)
 
         # Set title, icon, and size
         self.setWindowIcon(QIcon('./images/logo-256x256'))
@@ -315,33 +318,18 @@ class CustomizeDialog(QDialog):
         self.setWindowModality(Qt.ApplicationModal)
         self.resize(625, 250)
 
-        # Create About text
-        theme_lbl = QLabel('Themes')
-        theme_lbl.setAlignment(Qt.AlignCenter)
+        self.tabs = QTabWidget()
+        self.themes_tab = QWidget()
+        self.default_tab = QWidget()
 
-        # Create first row
-        customize_row_1 = QHBoxLayout()
-        customize_row_1.addStretch()
-        customize_row_1.addWidget(theme_lbl)
-        customize_row_1.addStretch()
+        self.tabs.addTab(self.default_tab, qta.icon('fa.user'), "Default")
+        self.tabs.addTab(self.themes_tab, qta.icon('fa.paint-brush'), "Themes")
 
-        # Create OK button
-        ok_btn = QPushButton("OK")
-        ok_btn.clicked.connect(self.close)
+        self.make_default_tab()
+        self.make_themes_tab()
 
-        # Create second row
-        customize_row_2 = QHBoxLayout()
-        customize_row_2.addStretch()
-        customize_row_2.addWidget(ok_btn)
-        customize_row_2.addStretch()
-
-        # Vertical layout
-        customize_v_box = QVBoxLayout()
-        customize_v_box.addLayout(customize_row_1)
-        customize_v_box.addStretch(1)
-        customize_v_box.addLayout(customize_row_2)
-        customize_v_box.addStretch(1)
-        self.setLayout(customize_v_box)
+        self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
 
         self.setStyleSheet('''
         QLabel, QPushButton {
@@ -349,6 +337,161 @@ class CustomizeDialog(QDialog):
             color: black;
         }
         ''')
+
+    def make_themes_tab(self):
+
+        # Create About text
+        theme_lbl = QLabel('Themes')
+        theme_lbl.setAlignment(Qt.AlignCenter)
+
+        # Create first row
+        themes_row_1 = QHBoxLayout()
+        themes_row_1.addStretch()
+        themes_row_1.addWidget(theme_lbl)
+        themes_row_1.addStretch()
+
+        # List of themes
+        self.plasma_theme_btn = QRadioButton("Plasma")
+        self.plasma_theme_btn.setChecked(True)
+        plasma_theme_lbl = QLabel(self)
+        plasma_theme_lbl.setPixmap(QPixmap('./images/plasma.png'))
+        plasma_theme_row = QHBoxLayout()
+        plasma_theme_row.addWidget(self.plasma_theme_btn)
+        plasma_theme_row.addWidget(plasma_theme_lbl)
+
+        self.viridis_theme_btn = QRadioButton("Viridis")
+        viridis_theme_lbl = QLabel(self)
+        viridis_theme_lbl.setPixmap(QPixmap('./images/viridis.png'))
+        viridis_theme_row = QHBoxLayout()
+        viridis_theme_row.addWidget(self.viridis_theme_btn)
+        viridis_theme_row.addWidget(viridis_theme_lbl)
+
+        self.magma_theme_btn = QRadioButton("Magma")
+        magma_theme_lbl = QLabel(self)
+        magma_theme_lbl.setPixmap(QPixmap('./images/magma.png'))
+        magma_theme_row = QHBoxLayout()
+        magma_theme_row.addWidget(self.magma_theme_btn)
+        magma_theme_row.addWidget(magma_theme_lbl)
+
+        self.inferno_theme_btn = QRadioButton("Inferno")
+        inferno_theme_lbl = QLabel(self)
+        inferno_theme_lbl.setPixmap(QPixmap('./images/inferno.png'))
+        inferno_theme_row = QHBoxLayout()
+        inferno_theme_row.addWidget(self.inferno_theme_btn)
+        inferno_theme_row.addWidget(inferno_theme_lbl)
+
+        self.oranges_theme_btn = QRadioButton("Oranges")
+        oranges_theme_lbl = QLabel(self)
+        oranges_theme_lbl.setPixmap(QPixmap('./images/oranges.png'))
+        oranges_theme_row = QHBoxLayout()
+        oranges_theme_row.addWidget(self.oranges_theme_btn)
+        oranges_theme_row.addWidget(oranges_theme_lbl)
+
+        self.reds_theme_btn = QRadioButton("Reds")
+        reds_theme_lbl = QLabel(self)
+        reds_theme_lbl.setPixmap(QPixmap('./images/reds.png'))
+        reds_theme_row = QHBoxLayout()
+        reds_theme_row.addWidget(self.reds_theme_btn)
+        reds_theme_row.addWidget(reds_theme_lbl)
+
+        self.purples_theme_btn = QRadioButton("Purples")
+        purples_theme_lbl = QLabel(self)
+        purples_theme_lbl.setPixmap(QPixmap('./images/purples.png'))
+        purples_theme_row = QHBoxLayout()
+        purples_theme_row.addWidget(self.purples_theme_btn)
+        purples_theme_row.addWidget(purples_theme_lbl)
+
+        self.blues_theme_btn = QRadioButton("Blues")
+        blues_theme_lbl = QLabel(self)
+        blues_theme_lbl.setPixmap(QPixmap('./images/blues.png'))
+        blues_theme_row = QHBoxLayout()
+        blues_theme_row.addWidget(self.blues_theme_btn)
+        blues_theme_row.addWidget(blues_theme_lbl)
+
+        self.greens_theme_btn = QRadioButton("Greens")
+        greens_theme_lbl = QLabel(self)
+        greens_theme_lbl.setPixmap(QPixmap('./images/greens.png'))
+        greens_theme_row = QHBoxLayout()
+        greens_theme_row.addWidget(self.greens_theme_btn)
+        greens_theme_row.addWidget(greens_theme_lbl)
+
+        self.greys_theme_btn = QRadioButton("Greys")
+        greys_theme_lbl = QLabel(self)
+        greys_theme_lbl.setPixmap(QPixmap('./images/greys.png'))
+        greys_theme_row = QHBoxLayout()
+        greys_theme_row.addWidget(self.greys_theme_btn)
+        greys_theme_row.addWidget(greys_theme_lbl)
+
+        # Create OK button
+        ok_btn = QPushButton("OK")
+        ok_btn.clicked.connect(self.close)
+
+        # Create Apply button
+        apply_btn = QPushButton("Apply")
+        apply_btn.clicked.connect(lambda: self.choose_theme())
+
+        # Create second row
+        themes_row_2 = QHBoxLayout()
+        themes_row_2.addStretch()
+        themes_row_2.addWidget(ok_btn)
+        themes_row_2.addWidget(apply_btn)
+        themes_row_2.addStretch()
+
+        # Vertical layout
+        themes_v_box = QVBoxLayout()
+        themes_v_box.addLayout(themes_row_1)
+        themes_v_box.addLayout(plasma_theme_row)
+        themes_v_box.addLayout(viridis_theme_row)
+        themes_v_box.addLayout(magma_theme_row)
+        themes_v_box.addLayout(inferno_theme_row)
+        themes_v_box.addLayout(oranges_theme_row)
+        themes_v_box.addLayout(reds_theme_row)
+        themes_v_box.addLayout(purples_theme_row)
+        themes_v_box.addLayout(blues_theme_row)
+        themes_v_box.addLayout(greens_theme_row)
+        themes_v_box.addLayout(greys_theme_row)
+        themes_v_box.addLayout(themes_row_2)
+        themes_v_box.addStretch(1)
+
+        self.themes_tab.setLayout(themes_v_box)
+
+    def make_default_tab(self):
+
+        default_lbl = QLabel('Default')
+        default_lbl.setAlignment(Qt.AlignCenter)
+
+        # Create first row
+        default_row_1 = QHBoxLayout()
+        default_row_1.addStretch()
+        default_row_1.addWidget(default_lbl)
+        default_row_1.addStretch()
+
+        default_v_box = QVBoxLayout()
+        default_v_box.addLayout(default_row_1)
+
+        self.default_tab.setLayout(default_v_box)
+
+    def choose_theme(self):
+        if self.plasma_theme_btn.isChecked():
+            THEME='plasma'
+        elif self.viridis_theme_btn.isChecked():
+            THEME='viridis'
+        elif self.magma_theme_btn.isChecked():
+            THEME='magma'
+        elif self.inferno_theme_btn.isChecked():
+            THEME='inferno'
+        elif self.oranges_theme_btn.isChecked():
+            THEME='oranges'
+        elif self.reds_theme_btn.isChecked():
+            THEME='reds'
+        elif self.purples_theme_btn.isChecked():
+            THEME='purples'
+        elif self.blues_theme_btn.isChecked():
+            THEME='blues'
+        elif self.greens_theme_btn.isChecked():
+            THEME='greens'
+        elif self.greys_theme_btn.isChecked():
+            THEME='greys'
 
 class App(QMainWindow):
 
