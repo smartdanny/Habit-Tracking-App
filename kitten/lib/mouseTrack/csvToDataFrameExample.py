@@ -13,22 +13,29 @@ def read_from_CSV(csvFileName):
     This function takes the name of a csv file with a path and returns
     a dataframe loaded with the information from that file
     '''
-    values = []
-    date = []
-    #Open the .csv file
-    with open(clickAndLoc.csvPath + csvFileName) as f:
-        reader = csv.reader(f)
-        columnNames = next(reader) # get the column names
-        values = [list(map(float, row)) for row in csv.reader(f)] # read in floats to array
-        
+
+
+    df = pd.read_csv(csvFileName)
+
     # Recalculate the time since epoch into timestamps
-    date.append(datetime.datetime.fromtimestamp(values[0][0]))
-    for i in range(1, len(values)):
-        values[i][0] = values[i-1][0] + values[i][0]
-        date.append(datetime.datetime.fromtimestamp(values[i][0])) # create an array of timestamps too
-    df = pd.DataFrame(values, columns = columnNames) # create dataframe with values and columns
-    df['Time'] = date # assign time stamps
-    return df
+    [rows, columns] = df.shape
+    print(rows)
+    timeStamp = [0] * rows
+    timesFloat = [0] * rows
+
+    timesFloat[0] = df.iloc[0]['Time']
+    timeStamp[0] = datetime.datetime.fromtimestamp(df.iloc[0]['Time'])
+    for i in range(1, rows):
+        # print(i)
+        timesFloat[i] = timesFloat[0] + df.iloc[i]['Time']
+        timeStamp[i] = datetime.datetime.fromtimestamp(timesFloat[i]) # create an array of timestamps too
+
+    lastTime = timesFloat[len(timesFloat)-1]
+    firstTime = timesFloat[0]
+
+    df['Time'] = timeStamp
+    print(df)
+    return df, lastTime, firstTime
 
 # EXAMPLE
 # df = read_from_CSV('mouseLoc.csv') #get the dataframe

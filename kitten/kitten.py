@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./lib/')
 import matplotlib
+import os.path
 import lib.mouseTrack.csvToDataFrameExample as csvHelper
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
@@ -14,7 +15,9 @@ from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
 from websiteTrack import proxyClient
+import datetime
 import time
+import lib.mouseTrack.csvToDataFrameExample as csvImport
 import pandas as pd
 import numpy as np
 import math
@@ -31,17 +34,17 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 # Globals
-THEME = "Oranges_r" # default graph theme
+THEME = "Oranges_r" # default theme
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
-    def __init__(self, type):
+    def __init__(self, type, min_time, max_time):
         self.screenSize = getScreenSize()
         if type == 'mouse':
-            fig = self.compute_mouse()
+            fig = self.compute_mouse(min_time, max_time)
         elif type == 'keyboard':
-            fig = self.compute_keyboard()
+            fig = self.compute_keyboard(min_time, max_time)
         elif type == 'website':
             fig = self.compute_website()
         elif type == 'programs':
@@ -53,31 +56,78 @@ class MyMplCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
 
-    def compute_mouse(self, min_time = 0, max_time = 0):
+    def compute_mouse(self, min_time, max_time):
     	# NEED TO convert input min_time and max_time to values to compare with csv
 
         # clear figure before graphing
         plt.clf()
 
-        try:
-            loc = pd.read_csv('./data/mouseLoc.csv')
-            if min_time != 0 and max_time != 0:
-                loc_clip = loc.iloc[1:] # ignore first entry
-                loc = loc_clip.loc[lambda loc: loc.Time >= min_time, :]
-                loc = loc.loc[lambda loc: loc.Time <= max_time, :]
-            sns.kdeplot(loc.x, loc.y, shade=True, cmap=THEME)
-        except:
-            pass
+        # both exist
+        if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
+            [locAll, lastTimeLoc, firstTimeLoc]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
+            [clicksAll, firstTimeClicks, firstTimeClicks]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
+            firstTime = min(firstTimeLoc, firstTimeClicks)
+            lastTime = max(lastTimeLoc, firstTimeLoc)
+            timeDifference = lastTime - firstTime
 
-        try:
-            clicks = pd.read_csv('./data/mouseClicks.csv')
-            if min_time != 0 and max_time != 0:
-            	clicks_clip = clicks.iloc[1:]  # have to ignore first entry due to epoch time
-            	clicks = clicks.loc[lambda clicks: clicks.Time >= min_time, :]
-            	clicks = clicks.loc[lambda clicks: clicks.Time <= max_time, :]
-            plt.scatter(clicks.x, clicks.y, c="w", marker="+")
-        except:
-            pass
+            print('\n')
+            print('GRAPHING RANGES -------------------------------------------')
+            print("First time = " + str(firstTime))
+            print("Last time = " + str(lastTime))
+            print("Total time over both clicks and locations = " + str(timeDifference))
+            min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+            max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+            print("Bottom range time = " + str(min_time))
+            print("Top range time = " + str(max_time))
+
+            # Make new dataframe to plot with limited time
+            loc = locAll[locAll['Time'].between(min_time, max_time)]
+            print('\nLOCATIONS GRAPHED -------------------------------------------')
+            print(loc)
+            clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
+            print('\nCLICKS GRAPHED -------------------------------------------')
+            print(clicks)
+
+            sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
+            plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
+
+        else:
+            if os.path.exists('./data/mouseLoc.csv'): # Just locations
+                # Read in from .csv
+                [locAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
+                timeDifference = lastTime - firstTime
+
+                # print(locAll) # print data being used
+                print("Total time over df = " + str(timeDifference))
+                print("First time = " + str(firstTime))
+                min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+                max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+                print("Minimum time = " + str(min_time))
+                print("Maximum time = " + str(max_time))
+
+                # Make new dataframe to plot with limited time
+                loc = locAll[locAll['Time'].between(min_time, max_time)]
+                print(loc)
+
+                sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
+
+            else: # Just Clicks
+                # Read in from .csv
+                [clicksAll, firstTime, firstTime]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
+                timeDifference = lastTime - firstTime
+
+                # print(locAll) # print data being used
+                print("Total time over df = " + str(timeDifference))
+                print("First time = " + str(firstTime))
+                min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+                max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+                print("Minimum time = " + str(min_time))
+                print("Maximum time = " + str(max_time))
+
+                # Make new dataframe to plot with limited time
+                clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
+                print(clicks)
+                plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
 
         # Set X and Y limits
         plt.ylim(0, self.screenSize.height()) #limits minimum and maximum values on graph to fit screen size
@@ -93,13 +143,27 @@ class MyMplCanvas(FigureCanvas):
         g = plt.gcf()
         return g
 
-    def compute_keyboard(self, min_time = 0, max_time = 0):
-    	# NEED TO convert min_time and max_time to values to compare with csv
-        keys = pd.read_csv('./data/keyboard.csv')
-        if min_time != 0 and max_time != 0:
-        	keys_clip = keys.iloc[1:]  # have to ignore first entry due to epoch time
-        	keys = keys.loc[lambda keys: keys.Time >= min_time, :]
-        	keys = keys.loc[lambda keys: keys.Time <= max_time, :]
+    def compute_keyboard(self, min_time, max_time):
+        # Get data from .csv
+        [keysAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/keyboard.csv')
+        timeDifference = lastTime - firstTime
+
+        # Narrow down data to appropriate time window
+        print('\n')
+        print('GRAPHING RANGES -------------------------------------------')
+        print("First time = " + str(firstTime))
+        print("Last time = " + str(lastTime))
+        print("Total time over both clicks and locations = " + str(timeDifference))
+        min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+        max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+        print("Bottom range time = " + str(min_time))
+        print("Top range time = " + str(max_time))
+
+        # Make new dataframe to plot with limited time
+        keys = keysAll[keysAll['Time'].between(min_time, max_time)]
+        print('\KEYS GRAPHED -------------------------------------------')
+        print(keys)
+
         # translate keys to image coordinates
         d= []
         for k in keys['Key']:
@@ -226,8 +290,8 @@ class MyMplCanvas(FigureCanvas):
             else:
                 pass  # ignore buttons not on standard keyboard
 
-        df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
 
+        df = pd.DataFrame(data=d, columns=['x','y'], dtype=int)
         # clear figure before graphing
         plt.clf()
         # graph onto figure
@@ -248,6 +312,22 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         if (THEME == "plasma"):
             cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        elif (THEME=="viridis"):
+        	cmap=matplotlib.cm.viridis(np.arange(0,1,.15))
+        elif (THEME=="magma"):
+        	cmap=matplotlib.cm.magma(np.arange(0,1,.15))
+        elif (THEME=="inferno"):
+        	cmap=matplotlib.cm.inferno(np.arange(0,1,.15))
+        elif (THEME=="Reds_r"):
+        	cmap=matplotlib.cm.Reds(np.arange(0.2,1,.1))
+        elif (THEME=="Purples_r"):
+        	cmap=matplotlib.cm.Purples(np.arange(0.2,1,.1))
+        elif (THEME=="Blues_r"):
+        	cmap=matplotlib.cm.Blues(np.arange(0.2,1,.1))
+        elif (THEME=="Greens_r"):
+        	cmap=matplotlib.cm.Greens(np.arange(0.2,1,.1))
+        elif (THEME=="Greys_r"):
+        	cmap=matplotlib.cm.Greys(np.arange(0.2,1,.1))
         else:
             cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle = plt.Circle( (0,0), 0.7, color='white')
@@ -267,8 +347,24 @@ class MyMplCanvas(FigureCanvas):
         # graph onto figure
         if (THEME == "plasma"):
             cmap=matplotlib.cm.plasma(np.arange(0,1,.15))
+        elif (THEME=="viridis"):
+        	cmap=matplotlib.cm.viridis(np.arange(0,1,.15))
+        elif (THEME=="magma"):
+        	cmap=matplotlib.cm.magma(np.arange(0,1,.15))
+        elif (THEME=="inferno"):
+        	cmap=matplotlib.cm.inferno(np.arange(0,1,.15))
+        elif (THEME=="Reds_r"):
+        	cmap=matplotlib.cm.Reds(np.arange(0.2,1,.1))
+        elif (THEME=="Purples_r"):
+        	cmap=matplotlib.cm.Purples(np.arange(0.2,1,.1))
+        elif (THEME=="Blues_r"):
+        	cmap=matplotlib.cm.Blues(np.arange(0.2,1,.1))
+        elif (THEME=="Greens_r"):
+        	cmap=matplotlib.cm.Greens(np.arange(0.2,1,.1))
+        elif (THEME=="Greys_r"):
+        	cmap=matplotlib.cm.Greys(np.arange(0.2,1,.1))
         else:
-   	        cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+            cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
         my_circle=plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=apps, colors=cmap)
         g = plt.gcf() # get current figure
@@ -872,6 +968,8 @@ class Home(QWidget):
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
+        # range_slider.startValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
+        # range_slider.endValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
 
@@ -1066,51 +1164,45 @@ class Home(QWidget):
     def plot_mouse_loc(self, row, min_time, max_time):
         if row.count() > 2:
             missingBoth = 0
-            try:
-                loc = pd.read_csv('./data/mouseLoc.csv')
-            except:
-                missingBoth+=1
-            try:
-                plt.scatter(clicks.x, clicks.y, c="w", marker="+")
-            except:
-                missingBoth+=1
+            if not os.path.exists('./data/mouseLoc.csv'):
+                 missingBoth+=1
+            if not os.path.exists('./data/mouseClicks.csv'):
+                 missingBoth+=1
 
             if missingBoth == 2:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
             else:
-                mouse_widget = MyMplCanvas('mouse')
+                mouse_widget = MyMplCanvas('mouse', min_time, max_time)
                 row.replaceWidget(row.itemAt(1).widget(), mouse_widget)
         else:
             missingBoth = 0
-            try:
-                loc = pd.read_csv('./data/mouseLoc.csv')
-            except:
-                missingBoth+=1
-            try:
-                plt.scatter(clicks.x, clicks.y, c="w", marker="+")
-            except:
-                missingBoth+=1
+            if not os.path.exists('./data/mouseLoc.csv'):
+                 missingBoth+=1
+            if not os.path.exists('./data/mouseClicks.csv'):
+                 missingBoth+=1
 
             if missingBoth == 2:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
             else:
-                mouse_widget = MyMplCanvas('mouse')
+                mouse_widget = MyMplCanvas('mouse', min_time, max_time)
                 row.addWidget(mouse_widget)
                 row.addStretch()
 
     def plot_keyboard_input(self, row, min_time, max_time):
         if row.count() > 2:
             try:
-                kb_widget = MyMplCanvas('keyboard')
+                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
                 row.replaceWidget(row.itemAt(1).widget(), kb_widget)
-            except:
+            except Exception as e:
+                print(e)
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
-                kb_widget = MyMplCanvas('keyboard')
+                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
                 row.addWidget(kb_widget)
                 row.addStretch()
-            except:
+            except Exception as e:
+                print(e)
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_website(self, row, min_time, max_time):

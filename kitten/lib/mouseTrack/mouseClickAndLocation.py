@@ -75,9 +75,9 @@ class MOUSETHREAD(mouse.Listener):
         self.t = round((time.time() - self.firstClickTime), 7)
         if self.recordClicks: # if recording is enabled...
             if pressed:
-                words = str(self.t) + ',' + 'p,' + str(self.x) + ',' + str(y)
+                words = str(self.t) + ',' +  str(self.x) + ',' + str(y)
             else:
-                words = str(self.t) + ',' + 'r,' + str(self.x) + ',' + str(y)
+                words = str(self.t) + ',' +  str(self.x) + ',' + str(y)
             print(words)
             self.write_csv('mouseClicks.csv', words + '\n') # prints p if pressed and r if released
 
@@ -119,7 +119,7 @@ class MOUSETHREAD(mouse.Listener):
             if(csv == 'mouseClicks.csv'):
                 self.firstClickTime = self.t
                 with open(csvPath + csv, 'a') as f:
-                    f.write('Time,Pressed/Released,x,y\n')
+                    f.write('Time,x,y\n')
 
         # Write data to file
         with open(csvPath + csv, 'a') as f:
