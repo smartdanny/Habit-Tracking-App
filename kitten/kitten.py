@@ -883,7 +883,8 @@ class Home(QWidget):
         websites_lbl = QLabel('Websites')
         websites_check_box = QCheckBox('Websites', self)
         self.websites_le = QLineEdit()
-        self.websites_le.setPlaceholderText('Ex: \'facebook.com,twitter.com \' ')
+        self.websites_le.setFixedWidth(300)
+        self.websites_le.setPlaceholderText('Ex: facebook.com, twitter.com')
         self.websites_le.setEnabled(False)
         websites_check_box.stateChanged.connect(self.switch_running_website_state)
         data_layout.addWidget(websites_lbl, 10, 1)
@@ -1260,7 +1261,7 @@ class Home(QWidget):
             self.websites_to_record = websites_textbox.text().split(',')
             print("You want to record:", self.websites_to_record)
             print("Recording NOT in sesh")
-            self.record_running_websites()
+            self.record_running_websites(self.websites_to_record)
         if self.running_website_selection and self.websites is not None:
             self.websites_to_record = websites_textbox.text().split(',')
             print("You want to record:", self.websites_to_record)
@@ -1283,10 +1284,11 @@ class Home(QWidget):
         if self.programs is not None:
             self.programs = None
         if self.websites is not None:
-            self.websites = None
-            self.client.disableProxy()
+            print("HELLO")
+            self.websites.disableProxy()
             time.sleep(1)
-            client.getLog()
+            self.websites.getLog()
+            self.websites = None
         if self.keyboard is not None:
             self.keyboard = None
         data_stop_btn.setEnabled(False)
@@ -1329,11 +1331,15 @@ class Home(QWidget):
     def record_running_programs(self):
         print('Recording running programs')
 
-    def record_running_websites(self):
+    def record_running_websites(self, websites_to_record):
         print('Recording running websites')
-        self.client = ProxyClient('167.99.61.206', 8080)
-        self.client.websites = self.websites_le.text()
-        self.client.enableProxy()
+        website_string = ''
+        for website in websites_to_record:
+            website_string += website + " "
+        website_string = website_string.rstrip()
+        print("website_string looks like: " + website_string)
+        self.websites = proxyClient.ProxyClient('167.99.61.206', 8080, website_string)
+        self.websites.enableProxy()
 
     # Functions used to change the state of whether or not user wants data recorded #
     # Used in check boxes #
