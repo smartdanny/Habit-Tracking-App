@@ -211,7 +211,7 @@ class MyMplCanvas(FigureCanvas):
             	d.append((545,125))
             elif "'" in k or '"' in k:
             	d.append((590,125))
-            elif "<" in k or "," in k:
+            elif "<" in k or "comma" in k:
             	d.append((470,175))
             elif ">" in k or "." in k:
             	d.append((515,175))
@@ -1121,20 +1121,20 @@ class Home(QWidget):
 
     def plot_keyboard_input(self, row, min_time, max_time):
         if row.count() > 2:
-            # try:
-            kb_widget = MyMplCanvas('keyboard', min_time, max_time)
-            row.replaceWidget(row.itemAt(1).widget(), kb_widget)
-            # except Exception as e:
-                # print(e)
-                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            try:
+                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
+                row.replaceWidget(row.itemAt(1).widget(), kb_widget)
+            except Exception as e:
+                print(e)
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
-            # try:
-            kb_widget = MyMplCanvas('keyboard', min_time, max_time)
-            row.addWidget(kb_widget)
-            row.addStretch()
-            # except Exception as e:
-                # print(e)
-                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            try:
+                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
+                row.addWidget(kb_widget)
+                row.addStretch()
+            except Exception as e:
+                print(e)
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_website(self, row, min_time, max_time):
         if row.count() > 2:

@@ -44,14 +44,25 @@ class KeyboardThread(keyboard.Listener):
             self.t = time.time()
             try:
                 #words = 'alphanumeric key {0} pressed'.format(key.char)
-                print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, {0}'.format(key.char))
-                self.t = round((self.t - self.firstTypeTime), 7)
-                words = str(self.t) + ', ' + 'p, {0}'.format(key.char)
+                if('{0}'.format(key.char) == ','):
+                    print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, comma')
+                    self.t = round((self.t - self.firstTypeTime), 7)
+                    words = str(self.t) + ', ' + 'p, comma'
+                else:
+                    print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, {0}'.format(key.char))
+                    self.t = round((self.t - self.firstTypeTime), 7)
+                    words = str(self.t) + ', ' + 'p, {0}'.format(key.char)
             except AttributeError:
                 #words = 'special key {0} pressed'.format(key)
-                print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, ' + '{0}'.format(key)[4:])
-                self.t = round((self.t - self.firstTypeTime), 7)
-                words = str(self.t) + ', ' + 'p, ' + '{0}'.format(key)[4:]
+                if('{0}'.format(key)[4:] == ','):
+                    print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, ' +'comma')
+                    self.t = round((self.t - self.firstTypeTime), 7)
+                    words = str(self.t) + ', ' + 'p, ' + 'comma'
+                else:
+                    print(str(datetime.datetime.fromtimestamp(self.t)) + ', ' + 'p, ' + '{0}'.format(key)[4:])
+                    self.t = round((self.t - self.firstTypeTime), 7)
+                    words = str(self.t) + ', ' + 'p, ' + '{0}'.format(key)[4:]
+
             self.write_csv('keyboard.csv', words + '\n')  # prints p if pressed
 
     def on_release(self,key):
