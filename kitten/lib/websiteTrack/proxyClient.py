@@ -60,14 +60,19 @@ class ProxyClient:
 
     def getLog(self):
         '''
-        Sends an HTTP POST request to the Kitten server that holds all the proxy logging informationself.
+        Sends an HTTP POST request to the Kitten server that holds all the proxy logging information.
         Writes the response into the websiteLog.csv that is held with the user's data folder.
         '''
         print("Sending POST request to Kitten server...")
         try:
             response = requests.post('http://' + self.server_host + ':' + str(self.server_port), data=self.websites)
-        except ConnectionError:
+            print("Received response from Kitten server...")
+            with open('./data/websites.csv', 'w') as log:
+                log.write(response.text)
+                print("Successfully written to website.csv")
+        except FileNotFoundError as e:
+            print("Unable to find the file (check the file path)...")
+            print(e)
+        except Exception as e:
             print("Unable to connect with Kitten server...")
-        print("Received response from Kitten server...")
-        with open('../../data/websiteLog.csv', 'w') as log:
-            log.write(response.text)
+            print(e)
