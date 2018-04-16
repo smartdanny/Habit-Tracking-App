@@ -64,69 +64,17 @@ class MyMplCanvas(FigureCanvas):
 
         # both exist
         if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
-            [locAll, lastTimeLoc, firstTimeLoc]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
-            [clicksAll, firstTimeClicks, firstTimeClicks]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
-            firstTime = min(firstTimeLoc, firstTimeClicks)
-            lastTime = max(lastTimeLoc, firstTimeLoc)
-            timeDifference = lastTime - firstTime
-
-            print('\n')
-            print('GRAPHING RANGES -------------------------------------------')
-            print("First time = " + str(firstTime))
-            print("Last time = " + str(lastTime))
-            print("Total time over both clicks and locations = " + str(timeDifference))
-            min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-            max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-            print("Bottom range time = " + str(min_time))
-            print("Top range time = " + str(max_time))
-
-            # Make new dataframe to plot with limited time
-            loc = locAll[locAll['Time'].between(min_time, max_time)]
-            print('\nLOCATIONS GRAPHED -------------------------------------------')
-            print(loc)
-            clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
-            print('\nCLICKS GRAPHED -------------------------------------------')
-            print(clicks)
-
+            [loc, clicks] = getLocAndClicksDF(min_time, max_time)
             sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
             plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
 
         else:
             if os.path.exists('./data/mouseLoc.csv'): # Just locations
-                # Read in from .csv
-                [locAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
-                timeDifference = lastTime - firstTime
-
-                # print(locAll) # print data being used
-                print("Total time over df = " + str(timeDifference))
-                print("First time = " + str(firstTime))
-                min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-                max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-                print("Minimum time = " + str(min_time))
-                print("Maximum time = " + str(max_time))
-
-                # Make new dataframe to plot with limited time
-                loc = locAll[locAll['Time'].between(min_time, max_time)]
-                print(loc)
-
+                loc = getLocDF(min_time, max_time)
                 sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
 
             else: # Just Clicks
-                # Read in from .csv
-                [clicksAll, firstTime, firstTime]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
-                timeDifference = lastTime - firstTime
-
-                # print(locAll) # print data being used
-                print("Total time over df = " + str(timeDifference))
-                print("First time = " + str(firstTime))
-                min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-                max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-                print("Minimum time = " + str(min_time))
-                print("Maximum time = " + str(max_time))
-
-                # Make new dataframe to plot with limited time
-                clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
-                print(clicks)
+                clicks = getClicksDF(min_time, max_time)
                 plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
 
         # Set X and Y limits
@@ -144,25 +92,7 @@ class MyMplCanvas(FigureCanvas):
         return g
 
     def compute_keyboard(self, min_time, max_time):
-        # Get data from .csv
-        [keysAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/keyboard.csv')
-        timeDifference = lastTime - firstTime
-
-        # Narrow down data to appropriate time window
-        print('\n')
-        print('GRAPHING RANGES -------------------------------------------')
-        print("First time = " + str(firstTime))
-        print("Last time = " + str(lastTime))
-        print("Total time over both clicks and locations = " + str(timeDifference))
-        min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-        max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-        print("Bottom range time = " + str(min_time))
-        print("Top range time = " + str(max_time))
-
-        # Make new dataframe to plot with limited time
-        keys = keysAll[keysAll['Time'].between(min_time, max_time)]
-        print('\KEYS GRAPHED -------------------------------------------')
-        print(keys)
+        keys = getKeysDF(min_time, max_time)
 
         # translate keys to image coordinates
         d= []
@@ -972,7 +902,7 @@ class Home(QWidget):
         # range_slider.startValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         # range_slider.endValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
-        download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv'))
+        download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv', range_slider.start(), range_slider.end()))
 
         # Add bottom border
         border_bottom = QLabel(self)
@@ -1028,7 +958,7 @@ class Home(QWidget):
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
         vis_btn.clicked.connect(lambda: self.plot_keyboard_input(row_2, range_slider.start(), range_slider.end()))
-        download_btn.clicked.connect(lambda: self.download_data('keyboard.csv'))
+        download_btn.clicked.connect(lambda: self.download_data('keyboard.csv', range_slider.start(), range_slider.end()))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
@@ -1075,7 +1005,7 @@ class Home(QWidget):
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
         vis_btn.clicked.connect(lambda: self.plot_website(row_2, range_slider.start(), range_slider.end()))
-        download_btn.clicked.connect(lambda: self.download_data('websites.csv'))
+        download_btn.clicked.connect(lambda: self.download_data('websites.csv', range_slider.start(), range_slider.end()))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
@@ -1122,7 +1052,7 @@ class Home(QWidget):
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
         vis_btn.clicked.connect(lambda: self.plot_apps(row_2, range_slider.start(), range_slider.end()))
-        download_btn.clicked.connect(lambda: self.download_data('programs.csv'))
+        download_btn.clicked.connect(lambda: self.download_data('programs.csv', range_slider.start(), range_slider.end()))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
@@ -1191,20 +1121,20 @@ class Home(QWidget):
 
     def plot_keyboard_input(self, row, min_time, max_time):
         if row.count() > 2:
-            try:
-                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
-                row.replaceWidget(row.itemAt(1).widget(), kb_widget)
-            except Exception as e:
-                print(e)
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            # try:
+            kb_widget = MyMplCanvas('keyboard', min_time, max_time)
+            row.replaceWidget(row.itemAt(1).widget(), kb_widget)
+            # except Exception as e:
+                # print(e)
+                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
-            try:
-                kb_widget = MyMplCanvas('keyboard', min_time, max_time)
-                row.addWidget(kb_widget)
-                row.addStretch()
-            except Exception as e:
-                print(e)
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            # try:
+            kb_widget = MyMplCanvas('keyboard', min_time, max_time)
+            row.addWidget(kb_widget)
+            row.addStretch()
+            # except Exception as e:
+                # print(e)
+                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def plot_website(self, row, min_time, max_time):
         if row.count() > 2:
@@ -1366,14 +1296,112 @@ class Home(QWidget):
             self.websites_le.setEnabled(True)
         self.running_website_selection = not self.running_website_selection
 
-    def download_data(self, data_name):
+    def download_data(self, data_name, min_time, max_time):
         fileName = QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\', QFileDialog.ShowDirsOnly)
         if fileName:
             try:
-                df = pd.read_csv('./data/' + data_name)
-                df.to_csv(fileName + '/' + data_name)
+                if data_name == 'mouseLoc.csv':
+                    # both exist
+                    if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
+                        [loc, clicks] = getLocAndClicksDF(min_time, max_time)
+                        loc.to_csv(fileName + '/' + 'mouseLoc.csv')
+                        clicks.to_csv(fileName + '/' + 'mouseClicks.csv')
+                    else:
+                        if os.path.exists('./data/mouseLoc.csv'): # Just locations
+                            loc = getLocDF(min_time, max_time)
+                        else: # Just Clicks
+                            clicks = getClicksDF(min_time, max_time)
+                if data_name == 'keyboard.csv':
+                    keys = getKeysDF(min_time, max_time)
+                    keys.to_csv(fileName + '/' + data_name)
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before downloading.")
+
+def getClicksDF(min_time, max_time):
+    # Read in from .csv
+    [clicksAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
+    timeDifference = lastTime - firstTime
+
+    # print(locAll) # print data being used
+    print("Total time over df = " + str(timeDifference))
+    print("First time = " + str(firstTime))
+    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+    print("Minimum time = " + str(min_time))
+    print("Maximum time = " + str(max_time))
+
+    # Make new dataframe to plot with limited time
+    clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
+    print(clicks)
+    return clicks
+
+def getLocDF(min_time, max_time):
+    # Read in from .csv
+    [locAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
+    timeDifference = lastTime - firstTime
+
+    # print(locAll) # print data being used
+    print("Total time over df = " + str(timeDifference))
+    print("First time = " + str(firstTime))
+    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+    print("Minimum time = " + str(min_time))
+    print("Maximum time = " + str(max_time))
+
+    # Make new dataframe to plot with limited time
+    loc = locAll[locAll['Time'].between(min_time, max_time)]
+    print(loc)
+    return loc
+
+def getLocAndClicksDF(min_time, max_time):
+    [locAll, lastTimeLoc, firstTimeLoc]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
+    [clicksAll, lastTimeClicks, firstTimeClicks]  = csvImport.read_from_CSV('./data/mouseClicks.csv')
+    firstTime = min(firstTimeLoc, firstTimeClicks)
+    lastTime = max(lastTimeLoc, lastTimeClicks)
+    timeDifference = lastTime - firstTime
+
+    print('\n')
+    print('GRAPHING RANGES -------------------------------------------')
+    print("First time = " + str(firstTime))
+    print("Last time = " + str(lastTime))
+    print("Total time over both clicks and locations = " + str(timeDifference))
+    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+    print("Bottom range time = " + str(min_time))
+    print("Top range time = " + str(max_time))
+
+    # Make new dataframe to plot with limited time
+    loc = locAll[locAll['Time'].between(min_time, max_time)]
+    print('\nLOCATIONS GRAPHED -------------------------------------------')
+    print(loc)
+    clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
+    print('\nCLICKS GRAPHED -------------------------------------------')
+    print(clicks)
+
+    return loc, clicks
+
+def getKeysDF(min_time, max_time):
+    # Get data from .csv
+    [keysAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/keyboard.csv')
+    timeDifference = lastTime - firstTime
+
+    # Narrow down data to appropriate time window
+    print('\n')
+    print('GRAPHING RANGES -------------------------------------------')
+    print("First time = " + str(firstTime))
+    print("Last time = " + str(lastTime))
+    print("Total time over both clicks and locations = " + str(timeDifference))
+    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
+    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
+    print("Bottom range time = " + str(min_time))
+    print("Top range time = " + str(max_time))
+
+    # Make new dataframe to plot with limited time
+    keys = keysAll[keysAll['Time'].between(min_time, max_time)]
+    print('\KEYS GRAPHED -------------------------------------------')
+    print(keys)
+
+    return keys
 
 def getScreenSize():
     ''' Returns screen size '''

@@ -15,7 +15,7 @@ def read_from_CSV(csvFileName):
     '''
 
 
-    df = pd.read_csv(csvFileName)
+    df = pd.read_csv(csvFileName, error_bad_lines=False)
 
     # Recalculate the time since epoch into timestamps
     [rows, columns] = df.shape
