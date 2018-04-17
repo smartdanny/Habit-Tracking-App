@@ -35,12 +35,24 @@ import matplotlib.image as mpimg
 
 # Globals
 THEME = "Oranges_r" # default theme
+keyboard_min_time_Stamp = 0
+keyboard_max_time_Stamp = 0
+mouse_min_time_Stamp = 0
+mouse_max_time_Stamp = 0
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
     def __init__(self, type, min_time, max_time):
         self.screenSize = getScreenSize()
+        global keyboard_min_time_Stamp
+        global keyboard_max_time_Stamp
+        global mouse_min_time_Stamp
+        global mouse_max_time_Stamp
+        keyboard_min_time_Stamp = 0
+        keyboard_max_time_Stamp = 0
+        mouse_min_time_Stamp = 0
+        mouse_max_time_Stamp = 0
         if type == 'mouse':
             fig = self.compute_mouse(min_time, max_time)
         elif type == 'keyboard':
@@ -61,21 +73,23 @@ class MyMplCanvas(FigureCanvas):
 
         # clear figure before graphing
         plt.clf()
+        global mouse_min_time_Stamp
+        global mouse_max_time_Stamp
 
         # both exist
         if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
-            [loc, clicks] = getLocAndClicksDF(min_time, max_time)
+            [loc, clicks, mouse_min_time_Stamp, mouse_max_time_Stamp] = getLocAndClicksDF(min_time, max_time)
             cbar_kws = { 'ticks' : [ 1,1 ] }
             sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME, cbar = True, cbar_kws = cbar_kws)
             plt.scatter(clicks['x'], clicks['y'], c="w", marker="+", label = 'clicks')
 
         else:
             if os.path.exists('./data/mouseLoc.csv'): # Just locations
-                loc = getLocDF(min_time, max_time)
+                [loc, mouse_min_time_Stamp, mouse_max_time_Stamp] = getLocDF(min_time, max_time)
                 sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME, cbar = True)
 
             else: # Just Clicks
-                clicks = getClicksDF(min_time, max_time)
+                [clicks, mouse_min_time_Stamp, mouse_max_time_Stamp] = getClicksDF(min_time, max_time)
                 plt.scatter(clicks['x'], clicks['y'], c="w", marker="+", label = 'clicks')
 
         # Set X and Y limits
@@ -92,10 +106,13 @@ class MyMplCanvas(FigureCanvas):
         plt.legend()
         # get current pyplot figure
         g = plt.gcf()
+        print('\nClick range from ' + str(mouse_min_time_Stamp) + ' to ' + str(mouse_max_time_Stamp))
         return g
 
     def compute_keyboard(self, min_time, max_time):
-        keys = getKeysDF(min_time, max_time)
+        global keyboard_min_time_Stamp
+        global keyboard_max_time_Stamp
+        [keys, keyboard_min_time_Stamp, keyboard_max_time_Stamp] = getKeysDF(min_time, max_time)
 
         # translate keys to image coordinates
         d= []
@@ -232,6 +249,8 @@ class MyMplCanvas(FigureCanvas):
         keyboard = mpimg.imread('./images/keyboard.png')
         plt.imshow(keyboard)
         g = plt.gcf() # get current figure
+
+        print('\nKeyboard range from ' + str(keyboard_min_time_Stamp) + ' to ' + str(keyboard_max_time_Stamp))
         return g
 
     def compute_website(self, min_time = 0, max_time = 0):
@@ -298,6 +317,7 @@ class MyMplCanvas(FigureCanvas):
         	cmap=matplotlib.cm.Greys(np.arange(0.2,1,.1))
         else:
             cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
+
         my_circle=plt.Circle( (0,0), 0.7, color='white')
         plt.pie(times, labels=apps, colors=cmap)
         g = plt.gcf() # get current figure
@@ -902,19 +922,18 @@ class Home(QWidget):
         vis_btn = QPushButton(qta.icon('fa.pie-chart',color='orange'),'Visualize Data', self)
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
+
+
+        # row_3 = QHBoxLayout()
+        # row_3.addStretch()
+
+
         # range_slider.startValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         # range_slider.endValueChanged.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         vis_btn.clicked.connect(lambda: self.plot_mouse_loc(row_2, range_slider.start(), range_slider.end()))
         download_btn.clicked.connect(lambda: self.download_data('mouseLoc.csv', range_slider.start(), range_slider.end()))
 
-        # Add bottom border
-        border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
-        border_bottom_row = QHBoxLayout()
-        border_bottom_row.addWidget(border_bottom)
 
-        # row_3 = self.timeInputDialog() #display the box for the start time
-        # row_4 = self.timeInputDialog() #display the box for the start time
 
         row_5 = QHBoxLayout()
         row_5.addStretch()
@@ -923,14 +942,18 @@ class Home(QWidget):
         row_5.addWidget(range_slider)
         row_5.addStretch()
 
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
         v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
         v_box.addStretch(1)
         v_box.addLayout(row_2)
         v_box.addStretch(1)
         # v_box.addLayout(row_3)
-        # v_box.addStretch(1)
-        # v_box.addLayout(row_4)
         # v_box.addStretch(1)
         v_box.addLayout(row_5)
         v_box.addLayout(border_bottom_row)
@@ -1096,6 +1119,8 @@ class Home(QWidget):
         self.help_tab.setLayout(v_box)
 
     def plot_mouse_loc(self, row, min_time, max_time):
+        global mouse_min_time_Stamp
+        global mouse_max_time_Stamp
         if row.count() > 2:
             missingBoth = 0
             if not os.path.exists('./data/mouseLoc.csv'):
@@ -1108,6 +1133,11 @@ class Home(QWidget):
             else:
                 mouse_widget = MyMplCanvas('mouse', min_time, max_time)
                 row.replaceWidget(row.itemAt(1).widget(), mouse_widget)
+
+                # time_range_lbl = QLabel(self)
+                # print(('/////////////////////////////////:\n' + str(mouse_min_time_Stamp) + ' to ' + str(mouse_max_time_Stamp)))
+                # time_range_lbl.setText('Shown range:\n' + str(mouse_min_time_Stamp) + ' to ' + str(mouse_max_time_Stamp))
+                # row_2.replaceWidget(row_2.itemAt(1).widget(), time_range_lbl)
         else:
             missingBoth = 0
             if not os.path.exists('./data/mouseLoc.csv'):
@@ -1122,7 +1152,15 @@ class Home(QWidget):
                 row.addWidget(mouse_widget)
                 row.addStretch()
 
+                # time_range_lbl = QLabel(self)
+                # print(('/////////////////////////////////:\n' + str(mouse_min_time_Stamp) + ' to ' + str(mouse_max_time_Stamp)))
+                # time_range_lbl.setText('Shown range:\n' + str(mouse_min_time_Stamp) + ' to ' + str(mouse_max_time_Stamp))
+                # row_2.addWidget(time_range_lbl)
+                # row_2.addStretch()
+
     def plot_keyboard_input(self, row, min_time, max_time):
+        global keyboard_min_time_Stamp
+        global keyboard_max_time_Stamp
         if row.count() > 2:
             try:
                 kb_widget = MyMplCanvas('keyboard', min_time, max_time)
@@ -1328,15 +1366,15 @@ def getClicksDF(min_time, max_time):
     # print(locAll) # print data being used
     print("Total time over df = " + str(timeDifference))
     print("First time = " + str(firstTime))
-    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-    print("Minimum time = " + str(min_time))
-    print("Maximum time = " + str(max_time))
+    min_time_Stamp = datetime.datetime.fromtimestamp(min_time * timeDifference/999 + firstTime)
+    max_time_Stamp = datetime.datetime.fromtimestamp(max_time * timeDifference/999 + firstTime)
+    print("Minimum time = " + str(min_time_Stamp))
+    print("Maximum time = " + str(max_time_Stamp))
 
     # Make new dataframe to plot with limited time
     clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
     print(clicks)
-    return clicks
+    return clicks, min_time_Stamp, max_time_Stamp
 
 def getLocDF(min_time, max_time):
     # Read in from .csv
@@ -1346,15 +1384,15 @@ def getLocDF(min_time, max_time):
     # print(locAll) # print data being used
     print("Total time over df = " + str(timeDifference))
     print("First time = " + str(firstTime))
-    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-    print("Minimum time = " + str(min_time))
-    print("Maximum time = " + str(max_time))
+    min_time_Stamp = datetime.datetime.fromtimestamp(min_time * timeDifference/999 + firstTime)
+    max_time_Stamp = datetime.datetime.fromtimestamp(max_time * timeDifference/999 + firstTime)
+    print("Minimum time = " + str(min_time_Stamp))
+    print("Maximum time = " + str(max_time_Stamp))
 
     # Make new dataframe to plot with limited time
-    loc = locAll[locAll['Time'].between(min_time, max_time)]
+    loc = locAll[locAll['Time'].between(min_time_Stamp, max_time_Stamp)]
     print(loc)
-    return loc
+    return loc, min_time_Stamp, max_time_Stamp
 
 def getLocAndClicksDF(min_time, max_time):
     [locAll, lastTimeLoc, firstTimeLoc]  = csvImport.read_from_CSV('./data/mouseLoc.csv')
@@ -1368,20 +1406,20 @@ def getLocAndClicksDF(min_time, max_time):
     print("First time = " + str(firstTime))
     print("Last time = " + str(lastTime))
     print("Total time over both clicks and locations = " + str(timeDifference))
-    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-    print("Bottom range time = " + str(min_time))
-    print("Top range time = " + str(max_time))
+    min_time_Stamp = datetime.datetime.fromtimestamp(min_time * timeDifference/999 + firstTime)
+    max_time_Stamp = datetime.datetime.fromtimestamp(max_time * timeDifference/999 + firstTime)
+    print("Bottom range time = " + str(min_time_Stamp))
+    print("Top range time = " + str(max_time_Stamp))
 
     # Make new dataframe to plot with limited time
-    loc = locAll[locAll['Time'].between(min_time, max_time)]
+    loc = locAll[locAll['Time'].between(min_time_Stamp, max_time_Stamp)]
     print('\nLOCATIONS GRAPHED -------------------------------------------')
     print(loc)
-    clicks = clicksAll[clicksAll['Time'].between(min_time, max_time)]
+    clicks = clicksAll[clicksAll['Time'].between(min_time_Stamp, max_time_Stamp)]
     print('\nCLICKS GRAPHED -------------------------------------------')
     print(clicks)
 
-    return loc, clicks
+    return loc, clicks, min_time_Stamp, max_time_Stamp
 
 def getKeysDF(min_time, max_time):
     # Get data from .csv
@@ -1394,17 +1432,17 @@ def getKeysDF(min_time, max_time):
     print("First time = " + str(firstTime))
     print("Last time = " + str(lastTime))
     print("Total time over both clicks and locations = " + str(timeDifference))
-    min_time = datetime.datetime.fromtimestamp(min_time * timeDifference/99 + firstTime)
-    max_time = datetime.datetime.fromtimestamp(max_time * timeDifference/99 + firstTime)
-    print("Bottom range time = " + str(min_time))
-    print("Top range time = " + str(max_time))
+    min_time_Stamp = datetime.datetime.fromtimestamp(min_time * timeDifference/999 + firstTime)
+    max_time_Stamp = datetime.datetime.fromtimestamp(max_time * timeDifference/999 + firstTime)
+    print("Bottom range time = " + str(min_time_Stamp))
+    print("Top range time = " + str(max_time_Stamp))
 
     # Make new dataframe to plot with limited time
-    keys = keysAll[keysAll['Time'].between(min_time, max_time)]
+    keys = keysAll[keysAll['Time'].between(min_time_Stamp, max_time_Stamp)]
     print('\KEYS GRAPHED -------------------------------------------')
     print(keys)
 
-    return keys
+    return keys, min_time_Stamp, max_time_Stamp
 
 def getScreenSize():
     ''' Returns screen size '''
