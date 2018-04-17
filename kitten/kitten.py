@@ -1081,17 +1081,56 @@ class Home(QWidget):
 
     def make_help_tab(self):
 
-        help_lbl = QLabel(self)
-        help_lbl.setText('Help')
+        v_box = QVBoxLayout()
+
+        # Add top border
+        border_top = QLabel(self)
+        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top_row = QHBoxLayout()
+        border_top_row.addWidget(border_top)
+
+        programs_lbl = QLabel('Help', self)
+        programs_lbl.setObjectName('tab_title')
         row_1 = QHBoxLayout()
         row_1.addStretch()
-        row_1.addWidget(help_lbl)
+        row_1.addWidget(programs_lbl)
         row_1.addStretch()
 
-        v_box = QVBoxLayout()
-        v_box.addStretch(1)
+        programs_lb2 = QLabel('How can I track my habits through Kitten?', self)
+        programs_lb2.setObjectName('tab_title')
+        row_2 = QHBoxLayout()
+        row_2.addWidget(programs_lb2)
+
+        programs_lb3 = QLabel('Kitten is a program that tracks and records a variety of user habits on a computer.', self)
+        programs_lb3.setObjectName('text')
+        row_3 = QHBoxLayout()
+        row_3.addWidget(programs_lb3)
+
+        programs_lb4 = QLabel('What types of habits does Kitten track?', self)
+        programs_lb4.setObjectName('tab_title')
+        row_4 = QHBoxLayout()
+        row_4.addWidget(programs_lb4)
+
+        programs_lb5 = QLabel('Lots of types.', self)
+        programs_lb5.setObjectName('text')
+        row_5 = QHBoxLayout()
+        row_5.addWidget(programs_lb5)
+
+        # Add bottom border
+        border_bottom = QLabel(self)
+        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom_row = QHBoxLayout()
+        border_bottom_row.addWidget(border_bottom)
+
+        v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
-        v_box.addStretch(1) # This takes up space at the bottom.
+        v_box.addStretch(1)
+        v_box.addLayout(row_2)
+        v_box.addLayout(row_3)
+        v_box.addLayout(row_4)
+        v_box.addLayout(row_5)
+        v_box.addStretch(1)
+        v_box.addLayout(border_bottom_row)
 
         self.help_tab.setLayout(v_box)
 
