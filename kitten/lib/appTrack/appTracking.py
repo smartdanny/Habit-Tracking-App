@@ -3,7 +3,11 @@ import time
 import datetime
 import csv as c
 import subprocess;
-csvPath = './'
+
+
+csvPath = '../data'
+# You probably need to use the row below this instead
+#csvPath = './data/'
 
 class AppThread():
 
