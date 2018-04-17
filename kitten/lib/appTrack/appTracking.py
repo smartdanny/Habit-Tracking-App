@@ -5,7 +5,7 @@ import csv as c
 import subprocess;
 
 
-csvPath = '../data'
+csvPath = './data/'
 # You probably need to use the row below this instead
 #csvPath = './data/'
 
