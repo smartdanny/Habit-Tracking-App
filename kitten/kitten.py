@@ -14,6 +14,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient, QKeySequence
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
+from appTrack import appTracking
 from websiteTrack import proxyClient
 import datetime
 import time
@@ -39,6 +40,8 @@ keyboard_min_time_Stamp = 0
 keyboard_max_time_Stamp = 0
 mouse_min_time_Stamp = 0
 mouse_max_time_Stamp = 0
+app_min_time_Stamp = 0
+app_max_time_Stamp = 0
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -58,11 +61,11 @@ class MyMplCanvas(FigureCanvas):
         elif type == 'keyboard':
             fig = self.compute_keyboard(min_time, max_time)
         elif type == 'website':
-            fig = self.compute_website()
+            fig = self.compute_website(min_time, max_time)
         elif type == 'programs':
-            fig = self.compute_programs()
+            fig = self.compute_programs(min_time, max_time)
         else: # default to mouse graph -- likely unnecessary
-            fig = self.compute_mouse()
+            fig = self.compute_mouse(min_time, max_time)
         FigureCanvas.__init__(self, fig)
         FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding, QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
@@ -288,7 +291,11 @@ class MyMplCanvas(FigureCanvas):
         g.gca().add_artist(my_circle)
         return g
 
-    def compute_programs(self, min_time = 0, max_time = 0):
+    def compute_programs(self, min_time, max_time):
+        global app_min_time_Stamp
+        global app_max_time_Stamp
+        [apps, app_min_time_Stamp, app_max_time_Stamp] = getAppDF(min_time, max_time)
+
         # apps = pd.read_csv('./data/programs.csv')
         # example data, real data read in from csv
         apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
@@ -1078,7 +1085,7 @@ class Home(QWidget):
         download_btn = QPushButton(qta.icon('fa.download', color='green'),'Download Data', self)
         range_slider = qrangeslider.QRangeSlider()
         vis_btn.clicked.connect(lambda: self.plot_apps(row_2, range_slider.start(), range_slider.end()))
-        download_btn.clicked.connect(lambda: self.download_data('programs.csv', range_slider.start(), range_slider.end()))
+        download_btn.clicked.connect(lambda: self.download_data('app.csv', range_slider.start(), range_slider.end()))
         row_3 = QHBoxLayout()
         row_3.addStretch()
         row_3.addWidget(vis_btn)
@@ -1219,13 +1226,13 @@ class Home(QWidget):
     def plot_website(self, row, min_time, max_time):
         if row.count() > 2:
             try:
-                web_widget = MyMplCanvas('website')
+                web_widget = MyMplCanvas('website', min_time, max_time)
                 row.replaceWidget(row.itemAt(1).widget(), web_widget)
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
-                web_widget = MyMplCanvas('website')
+                web_widget = MyMplCanvas('website', min_time, max_time)
                 row.addWidget(web_widget)
                 row.addStretch()
             except:
@@ -1234,13 +1241,13 @@ class Home(QWidget):
     def plot_apps(self, row, min_time, max_time):
         if row.count() > 2:
             try:
-                app_widget = MyMplCanvas('programs')
+                app_widget = MyMplCanvas('programs', min_time, max_time)
                 row.replaceWidget(row.itemAt(1).widget(), app_widget)
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
             try:
-                app_widget = MyMplCanvas('programs')
+                app_widget = MyMplCanvas('programs', min_time, max_time)
                 row.addWidget(app_widget)
                 row.addStretch()
             except:
@@ -1339,6 +1346,9 @@ class Home(QWidget):
         self.keyboard.recordkeyPress = True;
 
     def record_running_programs(self):
+        # UPDATE THIS!!!!
+        self.apps = appTracking.AppThread()
+        self.apps.get_data()
         print('Recording running programs')
 
     def record_running_websites(self, websites_to_record):
@@ -1383,17 +1393,22 @@ class Home(QWidget):
                 if data_name == 'mouseLoc.csv':
                     # both exist
                     if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
-                        [loc, clicks] = getLocAndClicksDF(min_time, max_time)
+                        [loc, clicks, a, b] = getLocAndClicksDF(min_time, max_time)
                         loc.to_csv(fileName + '/' + 'mouseLoc.csv')
                         clicks.to_csv(fileName + '/' + 'mouseClicks.csv')
                     else:
                         if os.path.exists('./data/mouseLoc.csv'): # Just locations
-                            loc = getLocDF(min_time, max_time)
+                            [loc, a, b] = getLocDF(min_time, max_time)
+                            loc.to_csv(fileName + '/' + 'mouseLoc.csv')
                         else: # Just Clicks
-                            clicks = getClicksDF(min_time, max_time)
+                            [clicks, a, b] = getClicksDF(min_time, max_time)
+                            clicks.to_csv(fileName + '/' + 'mouseClicks.csv')
                 if data_name == 'keyboard.csv':
-                    keys = getKeysDF(min_time, max_time)
-                    keys.to_csv(fileName + '/' + data_name)
+                    [keys, a, b] = getKeysDF(min_time, max_time)
+                    keys.to_csv(fileName + '/' + 'keyboard.csv')
+                if data_name == 'app.csv':
+                    [apps, a, b] = getAppDF(min_time, max_time)
+                    apps.to_csv(fileName + '/' + 'app.csv')
             except:
                 QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before downloading.")
 
@@ -1459,6 +1474,29 @@ def getLocAndClicksDF(min_time, max_time):
     print(clicks)
 
     return loc, clicks, min_time_Stamp, max_time_Stamp
+
+def getAppDF(min_time, max_time):
+    # Get data from .csv
+    [appsAll, lastTime, firstTime]  = csvImport.read_from_CSV('./data/app.csv')
+    timeDifference = lastTime - firstTime
+
+    # Narrow down data to appropriate time window
+    print('\n')
+    print('GRAPHING RANGES -------------------------------------------')
+    print("First time = " + str(firstTime))
+    print("Last time = " + str(lastTime))
+    print("Total time over both clicks and locations = " + str(timeDifference))
+    min_time_Stamp = datetime.datetime.fromtimestamp(min_time * timeDifference/999 + firstTime)
+    max_time_Stamp = datetime.datetime.fromtimestamp(max_time * timeDifference/999 + firstTime)
+    print("Bottom range time = " + str(min_time_Stamp))
+    print("Top range time = " + str(max_time_Stamp))
+
+    # Make new dataframe to plot with limited time
+    apps = appsAll[appsAll['Time'].between(min_time_Stamp, max_time_Stamp)]
+    print('APPS GRAPHED -------------------------------------------')
+    print(apps)
+
+    return apps, min_time_Stamp, max_time_Stamp
 
 def getKeysDF(min_time, max_time):
     # Get data from .csv
