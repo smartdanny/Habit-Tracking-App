@@ -65,17 +65,18 @@ class MyMplCanvas(FigureCanvas):
         # both exist
         if os.path.exists('./data/mouseLoc.csv') and os.path.exists('./data/mouseClicks.csv'):
             [loc, clicks] = getLocAndClicksDF(min_time, max_time)
-            sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
-            plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
+            cbar_kws = { 'ticks' : [ 1,1 ] }
+            sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME, cbar = True, cbar_kws = cbar_kws)
+            plt.scatter(clicks['x'], clicks['y'], c="w", marker="+", label = 'clicks')
 
         else:
             if os.path.exists('./data/mouseLoc.csv'): # Just locations
                 loc = getLocDF(min_time, max_time)
-                sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME)
+                sns.kdeplot(loc['x'], loc['y'], shade=True, cmap=THEME, cbar = True)
 
             else: # Just Clicks
                 clicks = getClicksDF(min_time, max_time)
-                plt.scatter(clicks['x'], clicks['y'], c="w", marker="+")
+                plt.scatter(clicks['x'], clicks['y'], c="w", marker="+", label = 'clicks')
 
         # Set X and Y limits
         plt.ylim(0, self.screenSize.height()) #limits minimum and maximum values on graph to fit screen size
@@ -87,6 +88,8 @@ class MyMplCanvas(FigureCanvas):
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position('top')
 
+
+        plt.legend()
         # get current pyplot figure
         g = plt.gcf()
         return g
