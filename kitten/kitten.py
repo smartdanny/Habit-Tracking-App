@@ -48,6 +48,7 @@ class MyMplCanvas(FigureCanvas):
 
     def __init__(self, type, min_time, max_time):
         self.screenSize = getScreenSize()
+        global THEME
         global keyboard_min_time_Stamp
         global keyboard_max_time_Stamp
         global mouse_min_time_Stamp
@@ -550,8 +551,9 @@ class CustomizeDialog(QDialog):
         self.default_tab.setLayout(default_v_box)
 
     def choose_theme(self):
+        global THEME
         if self.plasma_theme_btn.isChecked():
-            THEME='plasma'
+            THEME = 'plasma'
         elif self.viridis_theme_btn.isChecked():
             THEME='viridis'
         elif self.magma_theme_btn.isChecked():
@@ -570,6 +572,7 @@ class CustomizeDialog(QDialog):
             THEME='Greens_r'
         elif self.greys_theme_btn.isChecked():
             THEME='Greys_r'
+        # REFRESH PICS
 
 class App(QMainWindow):
 
@@ -726,7 +729,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         row_0 = QHBoxLayout()
         row_0.addWidget(border_top)
 
@@ -777,7 +780,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/' + THEME + '_bottom.png'))
         row_5 = QHBoxLayout()
         row_5.addWidget(border_bottom)
 
@@ -797,7 +800,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -865,7 +868,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/' + THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -913,7 +916,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -951,7 +954,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/' + THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -971,7 +974,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -1001,7 +1004,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/' + THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -1020,7 +1023,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -1048,7 +1051,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/'+ THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -1063,11 +1066,12 @@ class Home(QWidget):
         self.websites_tab.setLayout(v_box)
 
     def make_programs_tab(self):
+        global THEME
         v_box = QVBoxLayout()
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -1095,7 +1099,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/'+ THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -1115,7 +1119,7 @@ class Home(QWidget):
 
         # Add top border
         border_top = QLabel(self)
-        border_top.setPixmap(QPixmap('./images/border-top.png'))
+        border_top.setPixmap(QPixmap('./images/' + THEME + '_top.png'))
         border_top_row = QHBoxLayout()
         border_top_row.addWidget(border_top)
 
@@ -1148,7 +1152,7 @@ class Home(QWidget):
 
         # Add bottom border
         border_bottom = QLabel(self)
-        border_bottom.setPixmap(QPixmap('./images/border-bottom.png'))
+        border_bottom.setPixmap(QPixmap('./images/'+ THEME + '_bottom.png'))
         border_bottom_row = QHBoxLayout()
         border_bottom_row.addWidget(border_bottom)
 
@@ -1163,6 +1167,9 @@ class Home(QWidget):
         v_box.addLayout(border_bottom_row)
 
         self.help_tab.setLayout(v_box)
+
+    def refresh_images(self)
+        pass
 
     def plot_mouse_loc(self, row, min_time, max_time):
         global mouse_min_time_Stamp
