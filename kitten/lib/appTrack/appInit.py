@@ -1,4 +1,8 @@
 import appTracking as app
+
+# if cannot import appTracking, use following line
+#import lib.appTrack.appTracking as app
+
 import time
 
 if __name__ == '__main__':
