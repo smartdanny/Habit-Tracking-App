@@ -2,6 +2,7 @@ import sys
 sys.path.append('./lib/')
 import matplotlib
 import os.path
+import threading
 import lib.mouseTrack.csvToDataFrameExample as csvHelper
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
@@ -14,7 +15,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient, QKeySequence
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
-from appTrack import appTracking
+from appTrack import appTracking as appScript
 from websiteTrack import proxyClient
 import datetime
 import time
@@ -297,10 +298,16 @@ class MyMplCanvas(FigureCanvas):
         global app_max_time_Stamp
         [apps, app_min_time_Stamp, app_max_time_Stamp] = getAppDF(min_time, max_time)
 
-        # apps = pd.read_csv('./data/programs.csv')
-        # example data, real data read in from csv
-        apps = 'Steam', 'Google Chrome', 'Photoshop', 'Minesweeper',
-        times = [12,11,3.4,22]
+        print("GRAPHING APP INFORMATION///////////////// \n")
+        print(apps['App'].value_counts())
+
+        # appsGraphInfo = np.array(apps['App'].value_counts())
+        appsGraphInfo = list(apps['App'].value_counts())
+        appsGraphIndex = list(apps['App'].value_counts().index)
+        print(appsGraphInfo)
+        print(appsGraphIndex)
+        print('\n\n\n')
+        # print(appsGraphInfo.iloc['App'])
 
         # clear figure before graphing
         plt.clf()
@@ -327,7 +334,7 @@ class MyMplCanvas(FigureCanvas):
             cmap=matplotlib.cm.Oranges(np.arange(0.2,1,.1))
 
         my_circle=plt.Circle( (0,0), 0.7, color='white')
-        plt.pie(times, labels=apps, colors=cmap)
+        plt.pie(x=appsGraphInfo, labels=appsGraphIndex, colors=cmap)
         g = plt.gcf() # get current figure
         g.gca().add_artist(my_circle) # adds white circle to Artist -- parent of g
         return g
@@ -1247,18 +1254,18 @@ class Home(QWidget):
 
     def plot_apps(self, row, min_time, max_time):
         if row.count() > 2:
-            try:
-                app_widget = MyMplCanvas('programs', min_time, max_time)
-                row.replaceWidget(row.itemAt(1).widget(), app_widget)
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            # try:
+            app_widget = MyMplCanvas('programs', min_time, max_time)
+            row.replaceWidget(row.itemAt(1).widget(), app_widget)
+            # except:
+                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
-            try:
-                app_widget = MyMplCanvas('programs', min_time, max_time)
-                row.addWidget(app_widget)
-                row.addStretch()
-            except:
-                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            # try:
+            app_widget = MyMplCanvas('programs', min_time, max_time)
+            row.addWidget(app_widget)
+            row.addStretch()
+            # except:
+                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def initiate_data_collection(self, websites_textbox, programs_textbox, data_stop_btn, data_select_btn):
         # Check for which boxes are ticked and start collecting data for those boxes
@@ -1305,8 +1312,9 @@ class Home(QWidget):
         if self.keyboard is not None:
             self.keyboard.recordkeyPress = False
             self.keyboard = None
-        if self.programs is not None:
-            self.programs = None
+        if self.apps is not None:
+            self.apps.recordApps = False
+            self.apps = None
         if self.websites is not None:
             print("HELLO")
             self.websites.disableProxy()
@@ -1349,14 +1357,15 @@ class Home(QWidget):
         self.keyboard.recordkeyPress = False;
         self.keyboard.recordkeyRelease = False;
         self.keyboard.start()
-
         self.keyboard.recordkeyPress = True;
 
     def record_running_programs(self):
         # UPDATE THIS!!!!
-        self.apps = appTracking.AppThread()
-        self.apps.get_data()
-        print('Recording running programs')
+        # initialize all event triggers to be clear (don't record anything)
+        stopFlag = threading.Event()
+        self.apps = appScript.AppThread(stopFlag)
+        self.apps.recordApps = True
+        self.apps.start()
 
     def record_running_websites(self, websites_to_record):
         print('Recording running websites')
