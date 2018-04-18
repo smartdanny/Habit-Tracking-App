@@ -1168,7 +1168,7 @@ class Home(QWidget):
 
         self.help_tab.setLayout(v_box)
 
-    def refresh_images(self)
+    def refresh_images(self):
         pass
 
     def plot_mouse_loc(self, row, min_time, max_time):
