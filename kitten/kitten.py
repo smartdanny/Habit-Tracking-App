@@ -406,12 +406,9 @@ class CustomizeDialog(QDialog):
 
         self.tabs = QTabWidget()
         self.themes_tab = QWidget()
-        self.default_tab = QWidget()
 
-        self.tabs.addTab(self.default_tab, qta.icon('fa.user'), "Default")
         self.tabs.addTab(self.themes_tab, qta.icon('fa.paint-brush'), "Themes")
 
-        self.make_default_tab()
         self.make_themes_tab()
 
         self.layout.addWidget(self.tabs)
@@ -540,22 +537,6 @@ class CustomizeDialog(QDialog):
         themes_v_box.addStretch(1)
 
         self.themes_tab.setLayout(themes_v_box)
-
-    def make_default_tab(self):
-
-        default_lbl = QLabel('Default')
-        default_lbl.setAlignment(Qt.AlignCenter)
-
-        # Create first row
-        default_row_1 = QHBoxLayout()
-        default_row_1.addStretch()
-        default_row_1.addWidget(default_lbl)
-        default_row_1.addStretch()
-
-        default_v_box = QVBoxLayout()
-        default_v_box.addLayout(default_row_1)
-
-        self.default_tab.setLayout(default_v_box)
 
     def choose_theme(self):
         global THEME
