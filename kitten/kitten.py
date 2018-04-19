@@ -1235,18 +1235,18 @@ class Home(QWidget):
 
     def plot_apps(self, row, min_time, max_time):
         if row.count() > 2:
-            # try:
-            app_widget = MyMplCanvas('programs', min_time, max_time)
-            row.replaceWidget(row.itemAt(1).widget(), app_widget)
-            # except:
-                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            try:
+                app_widget = MyMplCanvas('programs', min_time, max_time)
+                row.replaceWidget(row.itemAt(1).widget(), app_widget)
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
         else:
-            # try:
-            app_widget = MyMplCanvas('programs', min_time, max_time)
-            row.addWidget(app_widget)
-            row.addStretch()
-            # except:
-                # QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
+            try:
+                app_widget = MyMplCanvas('programs', min_time, max_time)
+                row.addWidget(app_widget)
+                row.addStretch()
+            except:
+                QMessageBox.about(self, "Missing Data", "You do not have any data stored in Kitten. Please collect data before visualizing.")
 
     def initiate_data_collection(self, websites_textbox, programs_textbox, data_stop_btn, data_select_btn):
         # Check for which boxes are ticked and start collecting data for those boxes
