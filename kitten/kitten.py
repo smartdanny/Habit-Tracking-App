@@ -10,9 +10,9 @@ from os.path import expanduser
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,
                             QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QSizePolicy, QInputDialog,
                             QFileDialog, QMessageBox, QLineEdit, QDesktopWidget, QDialog, QTableWidget,
-                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup, QShortcut)
+                            QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup, QShortcut,  QScrollArea)
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient, QKeySequence
-from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt
+from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt, QRect
 from mouseTrack import mouseClickAndLocation
 from keyboardTrack import keyboardTracking
 from appTrack import appTracking as appScript
@@ -435,7 +435,6 @@ class CustomizeDialog(QDialog):
 
         # List of themes
         self.plasma_theme_btn = QRadioButton("Plasma")
-        self.plasma_theme_btn.setChecked(True)
         plasma_theme_lbl = QLabel(self)
         plasma_theme_lbl.setPixmap(QPixmap('./images/plasma.png'))
         plasma_theme_row = QHBoxLayout()
@@ -464,6 +463,7 @@ class CustomizeDialog(QDialog):
         inferno_theme_row.addWidget(inferno_theme_lbl)
 
         self.oranges_theme_btn = QRadioButton("Oranges")
+        self.oranges_theme_btn.setChecked(True)
         oranges_theme_lbl = QLabel(self)
         oranges_theme_lbl.setPixmap(QPixmap('./images/oranges.png'))
         oranges_theme_row = QHBoxLayout()
@@ -541,7 +541,7 @@ class CustomizeDialog(QDialog):
     def choose_theme(self):
         global THEME
         if self.plasma_theme_btn.isChecked():
-            THEME = 'plasma'
+            THEME='plasma'
         elif self.viridis_theme_btn.isChecked():
             THEME='viridis'
         elif self.magma_theme_btn.isChecked():
@@ -583,7 +583,7 @@ class App(QMainWindow):
         # Create stylsheet
         self.setStyleSheet('''
         QLabel#subtitle {
-            font: bold Myriad Pro;
+            font: bold "Myriad Pro";
             font-size: 30px;
             color: #E5943C;
         }
@@ -593,6 +593,13 @@ class App(QMainWindow):
         }
         QLabel#tab_title {
             font: 30px;
+        }
+        QLabel#sub-help {
+            font: bold 22px;
+            padding-bottom: 30px;
+        }
+        QLabel#help {
+            font: italic 22px;
         }
         QTabBar::tab {
         background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -1102,6 +1109,11 @@ class Home(QWidget):
         self.programs_tab.setLayout(v_box)
 
     def make_help_tab(self):
+        # self.scrollArea = QScrollArea(self)
+        # self.scrollArea.setWidgetResizable(True)
+        # self.scrollAreaWidgetContents = QWidget(self.scrollArea)
+        # self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 380, 247))
+        # self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         v_box = QVBoxLayout()
 
@@ -1118,25 +1130,47 @@ class Home(QWidget):
         row_1.addWidget(programs_lbl)
         row_1.addStretch()
 
-        programs_lb2 = QLabel('How can I track my habits through Kitten?', self)
-        programs_lb2.setObjectName('tab_title')
+        general_subtitle = QLabel('General', self)
+        general_subtitle.setObjectName('sub-help')
+        row_general_subtitle = QHBoxLayout()
+        row_general_subtitle.addWidget(general_subtitle)
+
+        q1 = QLabel('1. How can I track my habits through Kitten?', self)
+        q1.setObjectName('help')
         row_2 = QHBoxLayout()
-        row_2.addWidget(programs_lb2)
+        row_2.addWidget(q1)
 
-        programs_lb3 = QLabel('Kitten is a program that tracks and records a variety of user habits on a computer.', self)
-        programs_lb3.setObjectName('text')
+        q1_answer = QLabel('''
+Kitten is a program that tracks and records a variety of user habits on a computer.
+It can track how long you spend on a website or application, your mouse movements
+and mouse clicks, as well as key presses. It allows you to set preferences and
+settings for how the application and device data should be recorded and presented.''', self)
         row_3 = QHBoxLayout()
-        row_3.addWidget(programs_lb3)
+        row_3.addWidget(q1_answer)
 
-        programs_lb4 = QLabel('What types of habits does Kitten track?', self)
-        programs_lb4.setObjectName('tab_title')
+        q2 = QLabel('2. What types of habits does Kitten track?', self)
+        q2.setObjectName('help')
         row_4 = QHBoxLayout()
-        row_4.addWidget(programs_lb4)
+        row_4.addWidget(q2)
 
-        programs_lb5 = QLabel('Lots of types.', self)
-        programs_lb5.setObjectName('text')
+        q2_answer = QLabel('''
+Kitten allows you to track several different habits, including mouse movements,
+mouse clicks, keyboard usage, time spent on applications, and time spent on websites. ''', self)
+
         row_5 = QHBoxLayout()
-        row_5.addWidget(programs_lb5)
+        row_5.addWidget(q2_answer)
+
+        q3 = QLabel('3. Can I save the data that Kitten records after I end a tracking session?', self)
+        q3.setObjectName('help')
+        row_6 = QHBoxLayout()
+        row_6.addWidget(q3)
+
+        q3_answer = QLabel('''
+Yes. Kitten allows you to download the data from your session so that you can
+track your habits.  You can click “Download Data” in any of the data tracking tabs
+labeled “Mouse”, “Keyboard”, “Websites”, or “Programs”. ''', self)
+        row_7 = QHBoxLayout()
+        row_7.addWidget(q3_answer)
 
         # Add bottom border
         border_bottom = QLabel(self)
@@ -1146,12 +1180,15 @@ class Home(QWidget):
 
         v_box.addLayout(border_top_row)
         v_box.addLayout(row_1)
-        v_box.addStretch(1)
+        v_box.addLayout(row_general_subtitle)
         v_box.addLayout(row_2)
         v_box.addLayout(row_3)
         v_box.addLayout(row_4)
         v_box.addLayout(row_5)
-        v_box.addStretch(1)
+        v_box.addLayout(row_6)
+        v_box.addLayout(row_7)
+
+
         v_box.addLayout(border_bottom_row)
 
         self.help_tab.setLayout(v_box)
