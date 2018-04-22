@@ -1562,6 +1562,8 @@ def getScreenSize():
     return screen.size()
 
 if __name__ == '__main__':
+    if not os.path.exists('./data'):
+        os.makedirs('./data')
     app = QApplication(sys.argv)
     getScreenSize()
     ex = App()
