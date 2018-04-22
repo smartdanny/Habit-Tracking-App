@@ -835,7 +835,8 @@ class Home(QWidget):
         programs_check_box.stateChanged.connect(self.switch_running_program_state)
         data_layout.addWidget(programs_lbl, 7, 1)
         data_layout.addWidget(programs_check_box, 8, 1)
-        data_layout.addWidget(self.programs_le, 8, 2)
+        # data_layout.addWidget(self.programs_le, 8, 2)
+        data_layout.addWidget(QLabel('                                                                    '), 8, 2)
         data_layout.addWidget(QLabel(' '), 9, 1)
 
         websites_lbl = QLabel('Websites')
