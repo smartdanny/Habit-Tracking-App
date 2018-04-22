@@ -13,10 +13,10 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QA
                             QTableWidget, QGridLayout, QGroupBox, QSpacerItem, QRadioButton, QButtonGroup, QShortcut,  QScrollArea)
 from PyQt5.QtGui import QIcon, QPixmap, QFont, QLinearGradient, QKeySequence
 from PyQt5.QtCore import pyqtSlot, QCoreApplication, Qt, QRect
-from mouseTrack import mouseClickAndLocation
-from keyboardTrack import keyboardTracking
-from appTrack import appTracking as appScript
-from websiteTrack import proxyClient
+import lib.mouseTrack.mouseClickAndLocation as mouseClickAndLocation
+import lib.keyboardTrack.keyboardTracking as keyboardTracking
+import lib.appTrack.appTracking as appScript
+import lib.websiteTrack.proxyClient as proxyClient
 import datetime
 import time
 import lib.mouseTrack.csvToDataFrameExample as csvImport
@@ -835,8 +835,7 @@ class Home(QWidget):
         programs_check_box.stateChanged.connect(self.switch_running_program_state)
         data_layout.addWidget(programs_lbl, 7, 1)
         data_layout.addWidget(programs_check_box, 8, 1)
-        # data_layout.addWidget(self.programs_le, 8, 2)
-        data_layout.addWidget(QLabel('                                                                    '), 8, 2)
+        data_layout.addWidget(self.programs_le, 8, 2)
         data_layout.addWidget(QLabel(' '), 9, 1)
 
         websites_lbl = QLabel('Websites')
