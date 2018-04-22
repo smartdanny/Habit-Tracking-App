@@ -650,7 +650,7 @@ class Home(QWidget):
         # Threads to collect data
         self.mouse_clicks = None
         self.mouse_movement = None
-        self.programs = None
+        self.apps = None
         self.websites = None
         self.keyboard = None
 
@@ -1295,15 +1295,15 @@ labeled “Mouse”, “Keyboard”, “Websites”, or “Programs”. ''', sel
             self.record_keyboard_input()
 
         ## Programs
-        if self.running_program_selection and self.programs is None:
+        if self.running_program_selection and self.apps is None:
             self.programs_to_record = programs_textbox.text().split(',')
             print("You want to record:", self.programs_to_record)
             print("Recording NOT in sesh")
             self.record_running_programs()
-        if self.running_program_selection and self.programs is not None:
+        if self.running_program_selection and self.apps is not None:
             self.programs_to_record = programs_textbox.text().split(',')
             print("You want to record:", self.programs_to_record)
-            print("Recording already in sesh") ### SHATS YOU NEED TO REPLACE THIS 'RECORDING IN SESH' WITH STOPPING THE RECORDING AND STARTING A NEW ONE WITH NEW PROGRAMS LIST
+            print("Recording already in sesh")
 
         ## Websites
         if self.running_website_selection and self.websites is None:
@@ -1334,7 +1334,6 @@ labeled “Mouse”, “Keyboard”, “Websites”, or “Programs”. ''', sel
             self.apps.recordApps = False
             self.apps = None
         if self.websites is not None:
-            print("HELLO")
             self.websites.disableProxy()
             time.sleep(1)
             self.websites.getLog()
