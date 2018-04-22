@@ -26,7 +26,7 @@ import math
 import string
 import qtawesome as qta
 import seaborn as sns
-from qrangeslider import qrangeslider
+import lib.qrangeslider.qrangeslider as qrangeslider
 import matplotlib
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
