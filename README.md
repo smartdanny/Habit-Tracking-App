@@ -18,22 +18,17 @@ Navigate to the directory that holds `pip.exe` (or if the directory path is incl
 
 **We need to be sure to update the required Python modules to the install command above**
 
-## Running the tests
-
-## Deployment
-
-## Bugs
-
-## Built With
-
 ## License
 
 ## Authors
+* [Daniel Shats](https://github.com/smartdanny)
+* [Shandy Sulen](https://github.com/shandysulen)
 * [Madison Emas](https://github.com/madisel)
 * [Erin Fierce](https://github.com/erinfierce)
 * [Alexandra Isaly](https://github.com/aisaly)
 * [James Safko](https://github.com/jamessafko)
-* [Daniel Shatz](https://github.com/smartdanny)
-* [Shandy Sulen](https://github.com/shandysulen)
+
 
 ## Acknowledgements
+ * Michael Pabon (great TA guy)
+ * Professor Fox (great Professor guy)
